@@ -1,0 +1,12 @@
+# ignore the notes folder
+notes/
+
+
+# ignore the .clean.sh
+clean.sh
+
+# ignore the dot underscore files created by macOS
+._*
+
+# ignore DS_Store files created by macOS
+.DS_Store
