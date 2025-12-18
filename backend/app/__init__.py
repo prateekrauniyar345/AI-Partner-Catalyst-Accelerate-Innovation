@@ -11,10 +11,12 @@ def create_app(config_class=Config):
 
     # OpenAPI / Swagger settings
     app.config.update(
-        API_TITLE="My API",
-        API_VERSION="v1",
+        # app title eg : VoiceEd Ally API
+        API_TITLE="VoiceEd Ally API",
+        # base path for the API endpoints eg: / v1
+        API_VERSION="/v1",
         OPENAPI_VERSION="3.0.3",
-        OPENAPI_URL_PREFIX="/",              
+        OPENAPI_URL_PREFIX="/v1",              
         OPENAPI_SWAGGER_UI_PATH="/swagger-ui",
         OPENAPI_SWAGGER_UI_URL="https://cdn.jsdelivr.net/npm/swagger-ui-dist/",
     )
