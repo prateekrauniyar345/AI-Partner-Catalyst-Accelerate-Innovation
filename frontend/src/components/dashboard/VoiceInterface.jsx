@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume1, X, Sparkles } from 'lucide-react';
 import { Button } from '../../UI/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../UI/card';
 
 export function VoiceInterface({ onClose }) {
   const [isListening, setIsListening] = useState(false);
@@ -37,7 +36,12 @@ export function VoiceInterface({ onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-4"
+      style={{ 
+        background: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(4px)',
+        zIndex: 1050
+      }}
       onClick={onClose}
     >
       <motion.div
@@ -45,26 +49,25 @@ export function VoiceInterface({ onClose }) {
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl"
+        className="w-100"
+        style={{ maxWidth: '672px' }}
       >
-        <Card className="border-2 border-purple-200 shadow-2xl">
-          <CardHeader className="border-b">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600" />
-                Voice Learning Session
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={onClose}>
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-          </CardHeader>
+        <div className="card border shadow-lg" style={{ borderWidth: '2px', borderColor: '#e9d5ff' }}>
+          <div className="card-header border-bottom d-flex align-items-center justify-content-between">
+            <h5 className="card-title mb-0 d-flex align-items-center gap-2">
+              <Sparkles style={{ width: '20px', height: '20px', color: '#9333ea' }} />
+              Voice Learning Session
+            </h5>
+            <Button variant="ghost" size="sm" onClick={onClose} className="btn btn-sm btn-link">
+              <X style={{ width: '20px', height: '20px' }} />
+            </Button>
+          </div>
 
-          <CardContent className="pt-6">
+          <div className="card-body pt-4">
             {/* Microphone Visualizer */}
-            <div className="flex flex-col items-center mb-8">
+            <div className="d-flex flex-column align-items-center mb-4">
               <motion.div
-                className="relative"
+                className="position-relative"
                 animate={{
                   scale: isListening ? [1, 1.1, 1] : 1,
                 }}
@@ -79,7 +82,16 @@ export function VoiceInterface({ onClose }) {
                     {[...Array(3)].map((_, i) => (
                       <motion.div
                         key={i}
-                        className="absolute inset-0 rounded-full border-4 border-purple-300"
+                        className="position-absolute rounded-circle border"
+                        style={{
+                          width: '160px',
+                          height: '160px',
+                          borderWidth: '4px',
+                          borderColor: '#c084fc',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                        }}
                         initial={{ scale: 1, opacity: 0.5 }}
                         animate={{
                           scale: [1, 2, 3],
@@ -90,7 +102,6 @@ export function VoiceInterface({ onClose }) {
                           repeat: Infinity,
                           delay: i * 0.4,
                         }}
-                        style={{ width: '160px', height: '160px' }}
                       />
                     ))}
                   </>
@@ -99,33 +110,52 @@ export function VoiceInterface({ onClose }) {
                 {/* Main button */}
                 <button
                   onClick={handleToggleListening}
-                  className={`relative w-40 h-40 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 ${
-                    isListening
-                      ? 'bg-gradient-to-br from-red-500 to-pink-500'
-                      : 'bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
-                  }`}
+                  className="position-relative rounded-circle border-0 shadow-lg d-flex align-items-center justify-content-center"
+                  style={{
+                    width: '160px',
+                    height: '160px',
+                    background: isListening 
+                      ? 'linear-gradient(135deg, #ef4444, #ec4899)'
+                      : 'linear-gradient(135deg, #9333ea, #ec4899)',
+                    transition: 'all 0.3s',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isListening) {
+                      e.target.style.background = 'linear-gradient(135deg, #7c3aed, #db2777)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isListening) {
+                      e.target.style.background = 'linear-gradient(135deg, #9333ea, #ec4899)';
+                    }
+                  }}
                 >
                   {isListening ? (
-                    <MicOff className="w-16 h-16 text-white" />
+                    <MicOff style={{ width: '64px', height: '64px', color: 'white' }} />
                   ) : (
-                    <Mic className="w-16 h-16 text-white" />
+                    <Mic style={{ width: '64px', height: '64px', color: 'white' }} />
                   )}
                 </button>
 
                 {/* Status indicator */}
                 {isSpeaking && (
                   <motion.div
-                    className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-sm flex items-center gap-2"
+                    className="position-absolute start-50 translate-middle-x bg-success text-white rounded-pill d-flex align-items-center gap-2"
+                    style={{
+                      bottom: '-8px',
+                      padding: '4px 16px',
+                      fontSize: '0.875rem',
+                    }}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <Volume1 className="w-4 h-4" />
+                    <Volume1 style={{ width: '16px', height: '16px' }} />
                     Speaking...
                   </motion.div>
                 )}
               </motion.div>
 
-              <p className="mt-6 text-center text-gray-600">
+              <p className="mt-4 text-center" style={{ color: '#6b7280' }}>
                 {isListening
                   ? '🎤 Listening... Speak naturally'
                   : '👆 Tap the microphone to start learning'}
@@ -139,11 +169,11 @@ export function VoiceInterface({ onClose }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mb-4"
+                  className="mb-3"
                 >
-                  <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
-                    <div className="text-xs text-blue-600 mb-1">You said:</div>
-                    <div className="text-gray-800">{transcript}</div>
+                  <div className="rounded p-3" style={{ background: '#eff6ff', borderLeft: '4px solid #3b82f6' }}>
+                    <div className="small mb-1" style={{ color: '#2563eb', fontSize: '0.75rem' }}>You said:</div>
+                    <div style={{ color: '#1f2937' }}>{transcript}</div>
                   </div>
                 </motion.div>
               )}
@@ -154,25 +184,25 @@ export function VoiceInterface({ onClose }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <div className="bg-purple-50 border-l-4 border-purple-500 rounded-lg p-4">
-                    <div className="text-xs text-purple-600 mb-1 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
+                  <div className="rounded p-3" style={{ background: '#faf5ff', borderLeft: '4px solid #9333ea' }}>
+                    <div className="small mb-1 d-flex align-items-center gap-1" style={{ color: '#9333ea', fontSize: '0.75rem' }}>
+                      <Sparkles style={{ width: '12px', height: '12px' }} />
                       AI Tutor:
                     </div>
-                    <div className="text-gray-800">{aiResponse}</div>
+                    <div style={{ color: '#1f2937' }}>{aiResponse}</div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
             {/* Instructions */}
-            <div className="mt-6 pt-6 border-t">
-              <p className="text-sm text-gray-600 text-center">
+            <div className="mt-4 pt-4 border-top">
+              <p className="small text-center mb-0" style={{ color: '#6b7280' }}>
                 This is a demo interface. In the full version, you'll interact with real ElevenLabs voice AI and Google Gemini for adaptive, empathetic learning.
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </motion.div>
     </motion.div>
   );

@@ -35,8 +35,8 @@ export function Footer() {
           {/* Brand column */}
           <div className="col-12 col-lg-6">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="d-flex align-items-center gap-2 mb-3">
-              <div className="rounded-lg d-flex align-items-center justify-content-center" style={{ width: 40, height: 40, background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
-                <Mic className="text-white" />
+              <div className="rounded d-flex align-items-center justify-content-center" style={{ width: 40, height: 40, background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+                <Mic style={{ width: '20px', height: '20px', color: 'white' }} />
               </div>
               <span className="h5 mb-0 text-white">VoiceEd Ally</span>
             </motion.div>
@@ -97,13 +97,13 @@ export function Footer() {
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
             <div className="d-flex align-items-center gap-2 small text-white">
               <span>© {currentYear} VoiceEd Ally. Made with</span>
-              <Heart className="text-danger" />
+              <Heart style={{ width: '16px', height: '16px', color: '#dc3545' }} />
               <span>for accessibility</span>
             </div>
 
             <div className="d-flex align-items-center gap-3">
               <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none" aria-label="GitHub">
-                <Github />
+                <Github style={{ width: '20px', height: '20px' }} />
               </a>
               <div className="d-flex align-items-center gap-2 small text-white">
                 <span>Powered by</span>

@@ -23,8 +23,8 @@ export default function Navbar({ onStartLearning }) {
         <div className="d-flex align-items-center justify-content-between" style={{ height: '64px' }}>
           {/* Logo */}
           <div className="d-flex align-items-center">
-            <div className="rounded-lg d-flex align-items-center justify-content-center" style={{ width: 40, height: 40, background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
-              <Mic className="text-white" />
+            <div className="rounded d-flex align-items-center justify-content-center" style={{ width: 40, height: 40, background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+              <Mic style={{ width: '20px', height: '20px', color: 'white' }} />
             </div>
             <span className="ms-2 h5 mb-0">VoiceEd Ally</span>
           </div>
@@ -45,10 +45,10 @@ export default function Navbar({ onStartLearning }) {
               </a>
             ))}
             <Button variant="ghost" size="sm" className="btn-link text-secondary" aria-label="Accessibility features">
-              <Accessibility />
+              <Accessibility style={{ width: '20px', height: '20px' }} />
             </Button>
-            <Button onClick={onStartLearning} className="btn text-white" style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)' }}>
-              <Mic className="me-2" />
+            <Button onClick={onStartLearning} className="btn text-white border-0" style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)' }}>
+              <Mic className="me-2" style={{ width: '16px', height: '16px' }} />
               Start Learning
             </Button>
           </div>
@@ -59,7 +59,7 @@ export default function Navbar({ onStartLearning }) {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? <X /> : <Menu />}
+            {isMobileMenuOpen ? <X style={{ width: '20px', height: '20px' }} /> : <Menu style={{ width: '20px', height: '20px' }} />}
           </button>
         </div>
       </div>
@@ -94,10 +94,10 @@ export default function Navbar({ onStartLearning }) {
                     onStartLearning();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-100 text-white"
+                  className="w-100 text-white border-0"
                   style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)' }}
                 >
-                  <Mic className="me-2" />
+                  <Mic className="me-2" style={{ width: '16px', height: '16px' }} />
                   Start Learning
                 </Button>
               </div>

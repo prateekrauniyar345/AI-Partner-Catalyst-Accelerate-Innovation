@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Heart, Users, BookOpen, Globe } from 'lucide-react';
-import { Card, CardContent } from '../../UI/card';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 const stats = [
@@ -8,25 +7,25 @@ const stats = [
     icon: Users,
     value: '1B+',
     label: 'People with disabilities worldwide',
-    color: 'text-purple-600',
+    iconColor: '#9333ea',
   },
   {
     icon: BookOpen,
     value: '57M',
     label: 'Children out of school globally',
-    color: 'text-pink-600',
+    iconColor: '#ec4899',
   },
   {
     icon: Globe,
     value: 'SDG 4',
     label: 'Quality Education for All',
-    color: 'text-indigo-600',
+    iconColor: '#6366f1',
   },
   {
     icon: Heart,
     value: '24/7',
     label: 'Always accessible learning',
-    color: 'text-red-600',
+    iconColor: '#ef4444',
   },
 ];
 
@@ -61,29 +60,39 @@ export function Impact() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-5"
         >
-          <h2 className="mb-4 text-gray-900">
-            Making an <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Impact</span>
+          <h2 className="mb-4" style={{ color: '#111827', fontSize: '2.5rem', fontWeight: 'bold' }}>
+            Making an <span style={{ 
+              background: 'linear-gradient(90deg, #9333ea, #ec4899)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>Impact</span>
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto mb-12">
+          <p className="mx-auto mb-5" style={{ color: '#6b7280', maxWidth: '640px' }}>
             Education should be accessible to everyone, regardless of physical ability. We're committed to UN Sustainable Development Goal 4: Quality Education for All.
           </p>
         </motion.div>
 
-        <div className="row g-4 mb-4">
+        <div className="row g-4 mb-5">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1, duration: 0.6 }}>
-                <div className="col-12 col-md-6 col-lg-3">
-                  <Card className="text-center border rounded-3 shadow-sm">
-                    <CardContent className="py-3">
-                      <Icon className={`mb-3`} />
-                      <div className="h5 mb-1">{stat.value}</div>
-                      <p className="small text-muted">{stat.label}</p>
-                    </CardContent>
-                  </Card>
+              <motion.div 
+                key={stat.label} 
+                initial={{ opacity: 0, y: 20 }} 
+                whileInView={{ opacity: 1, y: 0 }} 
+                viewport={{ once: true }} 
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                className="col-12 col-md-6 col-lg-3"
+              >
+                <div className="card text-center border rounded-3 shadow-sm h-100">
+                  <div className="card-body py-4">
+                    <Icon style={{ width: '32px', height: '32px', color: stat.iconColor, marginBottom: '12px' }} />
+                    <div className="h4 mb-2" style={{ color: '#111827' }}>{stat.value}</div>
+                    <p className="small text-muted mb-0">{stat.label}</p>
+                  </div>
                 </div>
               </motion.div>
             );
@@ -96,35 +105,40 @@ export function Impact() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          className="text-center mb-4"
         >
-          <h3 className="mb-2 text-gray-900">Hear from Our Community</h3>
-          <p className="text-gray-600">Real stories from learners who've found independence through VoiceEd Ally</p>
+          <h3 className="mb-2" style={{ color: '#111827', fontSize: '2rem', fontWeight: 'bold' }}>Hear from Our Community</h3>
+          <p style={{ color: '#6b7280' }}>Real stories from learners who've found independence through VoiceEd Ally</p>
         </motion.div>
 
         <div className="row g-4">
           {testimonials.map((testimonial, index) => (
-            <motion.div key={testimonial.author} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.2, duration: 0.6 }}>
-              <div className="col-12 col-md-6 col-lg-4">
-                <Card className="h-100 border rounded-3 shadow-sm">
-                  <CardContent className="p-3">
-                    <div className="mb-3 text-center">
-                      <ImageWithFallback
-                        src={testimonial.image}
-                        alt={`${testimonial.author} - ${testimonial.role}`}
-                        className="rounded-circle me-auto ms-auto d-block" 
-                        style={{width:80,height:80,objectFit:'cover'}}
-                      />
-                    </div>
-                    <p className="text-muted fst-italic mb-3">
-                      "{testimonial.quote}"
-                    </p>
-                    <div className="text-center">
-                      <div className="fw-semibold">{testimonial.author}</div>
-                      <div className="small text-muted">{testimonial.role}</div>
-                    </div>
-                  </CardContent>
-                </Card>
+            <motion.div 
+              key={testimonial.author} 
+              initial={{ opacity: 0, y: 30 }} 
+              whileInView={{ opacity: 1, y: 0 }} 
+              viewport={{ once: true }} 
+              transition={{ delay: index * 0.2, duration: 0.6 }}
+              className="col-12 col-md-6 col-lg-4"
+            >
+              <div className="card h-100 border rounded-3 shadow-sm">
+                <div className="card-body p-4">
+                  <div className="mb-3 text-center">
+                    <ImageWithFallback
+                      src={testimonial.image}
+                      alt={`${testimonial.author} - ${testimonial.role}`}
+                      className="rounded-circle mx-auto d-block" 
+                      style={{width: '80px', height: '80px', objectFit: 'cover'}}
+                    />
+                  </div>
+                  <p className="text-muted fst-italic mb-3" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
+                    "{testimonial.quote}"
+                  </p>
+                  <div className="text-center">
+                    <div className="fw-semibold" style={{ color: '#111827' }}>{testimonial.author}</div>
+                    <div className="small text-muted">{testimonial.role}</div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           ))}

@@ -18,7 +18,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-vh-100 bg-white text-dark">
-      <a className="sr-only" href="#main">Skip to content</a>
+      <a className="visually-hidden" href="#main">Skip to content</a>
       <Navbar onStartLearning={handleStartLearning} />
       <main id="main">
         <Hero onStartLearning={handleStartLearning} />
