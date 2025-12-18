@@ -150,7 +150,7 @@ export function Hero({ onStartLearning }) {
 
           {/* Right column - Interactive Microphone Visualizer */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
             className="col-12 col-lg-6 d-flex align-items-center justify-content-center"

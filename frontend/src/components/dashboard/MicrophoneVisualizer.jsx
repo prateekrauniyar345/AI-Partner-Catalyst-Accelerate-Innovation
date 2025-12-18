@@ -13,20 +13,20 @@ export function MicrophoneVisualizer() {
   }, []);
 
   return (
-    <div className="position-relative d-flex align-items-center justify-content-center" style={{ width: '320px', height: '320px' }}>
+    <div className="position-relative d-flex align-items-center justify-content-center" style={{ width: '320px', height: '320px', left: '20%' }}>
       {/* Outer pulse rings */}
       {[...Array(3)].map((_, i) => (
         <motion.div
           key={i}
-          className="position-absolute rounded-circle border"
+          className="position-absolute rounded-circle"
           style={{
             width: '320px',
             height: '320px',
-            borderWidth: '4px',
-            borderColor: '#c084fc',
-            top: '50%',
-            left: '50%',
+            border: '2px solid #c084fc', // Shorthand ensures style, width, and color
+            // top: '50%',
+            // left: '50%',
             transform: 'translate(-50%, -50%)',
+           
           }}
           initial={{ scale: 0, opacity: 0 }}
           animate={{
@@ -43,24 +43,26 @@ export function MicrophoneVisualizer() {
       ))}
 
       {/* Animated bars around microphone */}
-      <div className="position-absolute top-50 start-50 translate-middle">
+      <div className="position-absolute top-0 start-0 w-100 h-100">
         {[...Array(12)].map((_, i) => {
           const angle = (i * 360) / 12;
+          const radius = 110; // distance from center
+
           return (
             <motion.div
               key={i}
               className="position-absolute rounded-pill"
               style={{
-                width: '4px',
-                background: 'linear-gradient(180deg, #9333ea, #ec4899)',
-                left: '50%',
-                top: '50%',
-                transform: `rotate(${angle}deg) translateY(-100px)`,
-                height: '20px',
-                transformOrigin: 'bottom center',
+                width: "4px",
+                background: "linear-gradient(180deg, #9333ea, #ec4899)",
+                left: "50%",
+                top: "50%",
+                height: "20px",
+                transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${radius}px)`,
+                transformOrigin: "50% 100%", // bottom-center
               }}
               animate={{
-                height: isActive ? ['20px', '40px', '20px'] : '20px',
+                height: isActive ? ["20px", "40px", "20px"] : "20px",
                 opacity: isActive ? [0.5, 1, 0.5] : 0.5,
               }}
               transition={{

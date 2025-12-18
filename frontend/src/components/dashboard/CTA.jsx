@@ -25,7 +25,9 @@ export function CTA({ onStartLearning }) {
           </p>
 
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-            <Button size="lg" onClick={onStartLearning} className="btn btn-light border-0 px-4 py-3" style={{ color: '#7c3aed', fontWeight: '600' }}>
+            <Button size="lg" onClick={onStartLearning} className="btn btn-light border-0 px-4 py-3" 
+              style={{ color: 'white  ', fontWeight: '600',background:'linear-gradient(90deg,#7c3aed,#ec4899)' }}
+            >
               <Mic className="me-2" style={{ width: '20px', height: '20px' }} />
               Start Learning Now - It's Free
             </Button>
