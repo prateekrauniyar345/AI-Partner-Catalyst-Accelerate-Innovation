@@ -1,12 +1,10 @@
-import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <p>this is react app</p>
+      <p className='text-dark'>this is react app</p>
     </>
   )
 }
