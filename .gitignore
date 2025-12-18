@@ -25,8 +25,11 @@ backend/.venv/
 
 
 # ignore the Python cache files
+__pycache__/
 **/__pycache__/
-**/*.pyc
+*.py[cod]
+**/*.py[cod]
+*.pyc
 
 # ignore the node modules folder
 frontend/node_modules/
