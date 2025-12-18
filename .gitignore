@@ -23,5 +23,10 @@ clean.sh
 # ignore the virtual environment folder
 backend/.venv/
 
+
+# ignore the Python cache files
+**/__pycache__/
+**/*.pyc
+
 # ignore the node modules folder
 frontend/node_modules/
