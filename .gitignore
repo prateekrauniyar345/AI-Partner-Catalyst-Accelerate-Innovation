@@ -17,6 +17,7 @@ clean.sh
 .env
 .env.prodcution
 .env.development
+.flaskenv
 
 
 # ignore the virtual environment folder
