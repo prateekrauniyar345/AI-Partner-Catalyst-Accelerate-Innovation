@@ -13,7 +13,8 @@ export function Hero({ onStartLearning }) {
           style={{
             width: '288px',
             height: '288px',
-            background: 'rgba(147, 51, 234, 0.2)',
+            background: 'rgba(112, 19, 198, 0.2)',
+            // background: 'rgba(82, 102, 31, 0.2)',
             top: '80px',
             left: '40px',
             filter: 'blur(80px)',
