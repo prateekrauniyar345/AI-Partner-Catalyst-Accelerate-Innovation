@@ -8,9 +8,6 @@
 # Notes and documentation
 notes/
 
-# Build scripts (optional - uncomment if you don't want to track them)
-# build.sh
-# clean.sh
 
 # ============================================
 # Environment Variables & Secrets
@@ -299,3 +296,9 @@ config.local.*
 # ignore the clean and build files
 build.sh
 clean.sh
+
+# ignore the underscore files
+*._
+
+# ignore the DS store files
+.DS_Store
