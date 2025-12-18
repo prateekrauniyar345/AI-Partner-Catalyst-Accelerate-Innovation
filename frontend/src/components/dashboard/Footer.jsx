@@ -52,43 +52,45 @@ export function Footer() {
           </div>
 
           {/* Links columns */}
-          <div className="col-6 col-md-4">
-            <h6 className="text-white mb-3">Product</h6>
-            <ul className="list-unstyled">
-              {footerLinks.product.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="d-block text-white text-decoration-none mb-2">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <div className="d-flex justify-content-center">
+            <div className="col-6 col-md-4">
+              <h6 className="text-white mb-3">Product</h6>
+              <ul className="list-unstyled">
+                {footerLinks.product.map((link) => (
+                  <li key={link.label}>
+                    <a href={link.href} className="d-block text-white text-decoration-none mb-2">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div className="col-6 col-md-4">
-            <h6 className="text-white mb-3">Resources</h6>
-            <ul className="list-unstyled">
-              {footerLinks.resources.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="d-block text-white text-decoration-none mb-2">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div className="col-6 col-md-4">
+              <h6 className="text-white mb-3">Resources</h6>
+              <ul className="list-unstyled">
+                {footerLinks.resources.map((link) => (
+                  <li key={link.label}>
+                    <a href={link.href} className="d-block text-white text-decoration-none mb-2">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div className="col-6 col-md-4">
-            <h6 className="text-white mb-3">Legal</h6>
-            <ul className="list-unstyled">
-              {footerLinks.legal.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="d-block text-white text-decoration-none mb-2">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <div className="col-6 col-md-4">
+              <h6 className="text-white mb-3">Legal</h6>
+              <ul className="list-unstyled">
+                {footerLinks.legal.map((link) => (
+                  <li key={link.label}>
+                    <a href={link.href} className="d-block text-white text-decoration-none mb-2">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
