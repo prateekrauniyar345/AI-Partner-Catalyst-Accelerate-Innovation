@@ -28,49 +28,36 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="bg-dark text-light">
+      <div className="container py-5">
         {/* Main footer content */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        <div className="row g-4 mb-4">
           {/* Brand column */}
-          <div className="lg:col-span-2">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="flex items-center gap-2 mb-4"
-            >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                <Mic className="w-6 h-6 text-white" />
+          <div className="col-12 col-lg-6">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="d-flex align-items-center gap-2 mb-3">
+              <div className="rounded-lg d-flex align-items-center justify-content-center" style={{ width: 40, height: 40, background: 'linear-gradient(135deg,#7c3aed,#ec4899)' }}>
+                <Mic className="text-white" />
               </div>
-              <span className="text-xl text-white">VoiceEd Ally</span>
+              <span className="h5 mb-0 text-white">VoiceEd Ally</span>
             </motion.div>
-            <p className="text-sm text-gray-400 mb-4 max-w-md">
+            <p className="small text-white mb-3">
               An inclusive, voice-driven educational companion empowering people with disabilities to learn independently through AI-powered adaptive tutoring.
             </p>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <div className="d-flex align-items-center gap-2 small text-white">
               <span>Built for</span>
-              <a
-                href="https://cloud.google.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-400 hover:text-purple-300 transition-colors"
-              >
+              <a href="https://cloud.google.com/" target="_blank" rel="noopener noreferrer" className="text-decoration-none text-info">
                 Google Cloud AI Hackathon
               </a>
             </div>
           </div>
 
           {/* Links columns */}
-          <div>
-            <h3 className="text-white mb-4">Product</h3>
-            <ul className="space-y-2">
+          <div className="col-6 col-md-4">
+            <h6 className="text-white mb-3">Product</h6>
+            <ul className="list-unstyled">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
-                  >
+                  <a href={link.href} className="d-block text-white text-decoration-none mb-2">
                     {link.label}
                   </a>
                 </li>
@@ -78,15 +65,12 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-white mb-4">Resources</h3>
-            <ul className="space-y-2">
+          <div className="col-6 col-md-4">
+            <h6 className="text-white mb-3">Resources</h6>
+            <ul className="list-unstyled">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
-                  >
+                  <a href={link.href} className="d-block text-white text-decoration-none mb-2">
                     {link.label}
                   </a>
                 </li>
@@ -94,15 +78,12 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-white mb-4">Legal</h3>
-            <ul className="space-y-2">
+          <div className="col-6 col-md-4">
+            <h6 className="text-white mb-3">Legal</h6>
+            <ul className="list-unstyled">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-gray-400 hover:text-purple-400 transition-colors"
-                  >
+                  <a href={link.href} className="d-block text-white text-decoration-none mb-2">
                     {link.label}
                   </a>
                 </li>
@@ -112,42 +93,31 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-800 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+        <div className="border-top pt-3 mt-4 border-secondary">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div className="d-flex align-items-center gap-2 small text-white">
               <span>© {currentYear} VoiceEd Ally. Made with</span>
-              <Heart className="w-4 h-4 text-red-500 fill-current" />
+              <Heart className="text-danger" />
               <span>for accessibility</span>
             </div>
 
-            <div className="flex items-center gap-6">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="GitHub"
-              >
-                <Github className="w-5 h-5" />
+            <div className="d-flex align-items-center gap-3">
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none" aria-label="GitHub">
+                <Github />
               </a>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="d-flex align-items-center gap-2 small text-white">
                 <span>Powered by</span>
-                <span className="text-purple-400">ElevenLabs</span>
+                <span className="text-info">ElevenLabs</span>
                 <span>&</span>
-                <span className="text-pink-400">Google Gemini</span>
+                <span className="text-danger">Google Gemini</span>
               </div>
             </div>
           </div>
 
           {/* SDG badge */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="mt-6 text-center"
-          >
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-900/50 to-pink-900/50 border border-purple-700/50 rounded-full px-4 py-2">
-              <span className="text-sm text-gray-300">Supporting UN SDG 4: Quality Education</span>
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-3 text-center">
+            <div className="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2" style={{ background: 'linear-gradient(90deg, rgba(55,0,179,0.12), rgba(236,72,153,0.12))', border: '1px solid rgba(124,58,237,0.12)' }}>
+              <span className="small text-white">Supporting UN SDG 4: Quality Education</span>
             </div>
           </motion.div>
         </div>
