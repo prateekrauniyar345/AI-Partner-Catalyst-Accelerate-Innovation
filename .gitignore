@@ -2,7 +2,8 @@
 notes/
 
 
-# ignore the .clean.sh
+# ignore the .clean.sh and build file
+build.sh
 clean.sh
 
 # ignore the dot underscore files created by macOS
@@ -16,3 +17,10 @@ clean.sh
 .env
 .env.prodcution
 .env.development
+
+
+# ignore the virtual environment folder
+backend/.venv/
+
+# ignore the node modules folder
+frontend/node_modules/
