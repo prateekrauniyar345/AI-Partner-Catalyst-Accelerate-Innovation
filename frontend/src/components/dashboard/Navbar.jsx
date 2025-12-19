@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { Mic, Menu, X, Accessibility } from 'lucide-react';
 import { Button } from '../../UI/button';
 
-export default function Navbar({ onStartLearning }) {
+export default function Navbar({ onStartLearning, onOpenSignIn, onOpenSignUp }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -24,7 +23,11 @@ export default function Navbar({ onStartLearning }) {
       <div className="container">
         <div className="d-flex align-items-center justify-content-between w-100" style={{ height: '64px' }}>
           {/* Logo - Left */}
-          <div className="d-flex align-items-center">
+          <div
+            className="d-flex align-items-center"
+            style={{ cursor: 'pointer' }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
             <div className="rounded d-flex align-items-center justify-content-center" style={{ width: 40, height: 40, background: 'linear-gradient(90deg,#7c3aed,#ec4899)', borderRadius: '8px' }}>
               <Mic style={{ width: '20px', height: '20px', color: 'white' }} />
             </div>
@@ -58,12 +61,22 @@ export default function Navbar({ onStartLearning }) {
 
           {/* Action Buttons - Right */}
           <div className="d-none d-lg-flex align-items-center gap-2">
-            <Link to="/signin" className="btn btn-link text-decoration-none" style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}>
+            <button
+              type="button"
+              className="btn btn-link text-decoration-none"
+              style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
+              onClick={(e) => { e.preventDefault(); onOpenSignIn && onOpenSignIn(); }}
+            >
               Sign In
-            </Link>
-            <Link to="/signup" className="btn btn-link text-decoration-none" style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}>
+            </button>
+            <button
+              type="button"
+              className="btn btn-link text-decoration-none"
+              style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
+              onClick={(e) => { e.preventDefault(); onOpenSignUp && onOpenSignUp(); }}
+            >
               Sign Up
-            </Link>
+            </button>
             <Button 
               onClick={onStartLearning} 
               className="btn text-white border-0 rounded" 
@@ -117,20 +130,20 @@ export default function Navbar({ onStartLearning }) {
                 </a>
               ))}
               <div className="mt-3 pt-3 border-top d-flex flex-column gap-2">
-                <Link 
-                  to="/signin" 
+                <button
+                  type="button"
                   className="btn btn-outline-secondary w-100"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => { setIsMobileMenuOpen(false); onOpenSignIn && onOpenSignIn(); }}
                 >
                   Sign In
-                </Link>
-                <Link 
-                  to="/signup" 
+                </button>
+                <button
+                  type="button"
                   className="btn btn-outline-secondary w-100"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => { setIsMobileMenuOpen(false); onOpenSignUp && onOpenSignUp(); }}
                 >
                   Sign Up
-                </Link>
+                </button>
                 <Button
                   onClick={() => {
                     onStartLearning();

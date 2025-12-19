@@ -1,10 +1,6 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Button from 'react-bootstrap/Button'
-import Navbar from '../../components/dashboard/Navbar';
+import React, { useEffect, useState } from 'react'
 
-export default function SignUp() {
-  const navigate = useNavigate()
+export default function SignUpModal({ open, onClose, onSuccess }) {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -12,6 +8,15 @@ export default function SignUp() {
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e) => { if (e.key === 'Escape') onClose && onClose() }
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('keydown', onKey) }
+  }, [open, onClose])
+
+  if (!open) return null
 
   function validate() {
     if (!firstName || !email || !password) return 'Please fill required fields.'
@@ -25,41 +30,34 @@ export default function SignUp() {
     setError('')
     const v = validate()
     if (v) { setError(v); return }
-
     setLoading(true)
     try {
       const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName, lastName, email, password })
       })
       const data = await res.json()
-      if (!res.ok) {
-        setError(data?.message || 'Sign up failed')
-        setLoading(false)
-        return
-      }
-
+      if (!res.ok) { setError(data?.message || 'Sign up failed'); setLoading(false); return }
       if (data.token) localStorage.setItem('token', data.token)
-      navigate('/')
-    } catch {
+      onSuccess && onSuccess(data)
+      onClose && onClose()
+    } catch (err) {
       setError('Network error — try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  function handleGoogle() {
-    window.location.href = '/auth/google'
+    } finally { setLoading(false) }
   }
 
   return (
-    <div className="d-flex align-items-center justify-content-center min-vh-100" style={{ background: '#fff' }}>
-      <div className="card shadow-sm" style={{ width: 520, borderRadius: 12 }}>
+    <div className="d-flex align-items-center justify-content-center" style={{ position: 'fixed', inset: 0, zIndex: 1050 }}>
+      <div className="position-absolute" style={{ inset: 0, background: 'rgba(0,0,0,0.7)' }} onClick={onClose} />
+      <div className="card shadow" role="dialog" aria-modal="true" style={{ width: 520, zIndex: 1060, borderRadius: 12 }}>
         <div className="card-body p-4">
-          
-          {/* Navbar */}
-          <Navbar />
+          <div className="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h5 className="mb-0">Create your VoiceEd account</h5>
+              <small className="text-muted">Get started with voice-first learning</small>
+            </div>
+            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={onClose}>Close</button>
+          </div>
 
           {error && <div className="alert alert-danger py-2">{error}</div>}
 
@@ -90,23 +88,15 @@ export default function SignUp() {
               <input type="password" className="form-control" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
             </div>
 
-            <Button type="submit" className="w-100 mb-3" disabled={loading} style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)', border: 'none' }}>
-              {loading ? 'Creating account…' : 'Create account'}
-            </Button>
+            <div className="d-grid gap-2">
+              <button type="submit" className="btn text-white" style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)', border: 'none' }} disabled={loading}>
+                {loading ? 'Creating account…' : 'Create account'}
+              </button>
+              <button type="button" className="btn btn-outline-secondary" onClick={() => { window.location.href = '/auth/google' }}>
+                <i className="bi bi-google me-2" /> Continue with Google
+              </button>
+            </div>
           </form>
-
-          <div className="text-center mb-2">
-            <small className="text-muted">or create account with</small>
-          </div>
-
-          <div className="d-grid gap-2">
-            <Button variant="outline-secondary" onClick={handleGoogle}>
-              <i className="bi bi-google me-2" /> Continue with Google
-            </Button>
-            <Button variant="outline-secondary" onClick={() => navigate('/signin')}>
-              Already have an account? Sign in
-            </Button>
-          </div>
         </div>
       </div>
     </div>
