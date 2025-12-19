@@ -23,7 +23,9 @@ def create_app(config_class=Config):
     api = Api(app)
 
     # register route blueprints
-    from app.api.users import blp as users_blp
+    from app.api.users import users_blp
+    from app.api.auth import auth_blp
     api.register_blueprint(users_blp)
+    api.register_blueprint(auth_blp)
 
     return app

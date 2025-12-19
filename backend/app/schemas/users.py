@@ -12,9 +12,6 @@ class UserSchema(Schema):
 
 class CreateUserSchema(Schema):
     """Payload for POST /users (create a new user)."""
-    # The `id` can be omitted if you let the DB generate it;
-    # keep it required here only if you need client‑side IDs.
-    id = fields.Int(required=True)
     first_name = fields.Str(required=False, allow_none=True)
     last_name = fields.Str(required=False, allow_none=True)
     username = fields.Str(required=True)
