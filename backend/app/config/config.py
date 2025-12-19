@@ -16,6 +16,8 @@ class Config(BaseSettings):
     FLASK_PORT: int = Field(int(os.getenv("FLASK_PORT", 5000)), description="The Flask port number")
 
 
-
+class SupabaseConfig(BaseSettings):
+    SUPABASE_URL: str = Field(os.getenv("SUPABASE_URL"), description="The Supabase project URL")
+    SUPABASE_API_KEY: str = Field(os.getenv("SUPABASE_API_KEY"), description="The Supabase API key")
 
     
