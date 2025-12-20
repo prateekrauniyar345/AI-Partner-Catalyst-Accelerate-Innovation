@@ -10,6 +10,7 @@ from ..schemas.auth import (
     PasswordResetConfirmSchema,
     VerifyOTPSchema,
 )
+
 from ..auth.supabase_client import supabase_client
 from functools import wraps
 
@@ -44,17 +45,18 @@ def signup(data):
     }
 
     supabase = supabase_client
-    resp = supabase.auth.sign_up(email=email, password=password, options={"data": user_metadata})
-    if resp.get("error"):
-        abort(400, message=resp["error"]["message"])
+    try:
+        resp = supabase.auth.sign_up(
+            {"email": email, "password": password, "options": {"data": user_metadata}}
+        )
+        session = resp.session
+        user = resp.user
+    except Exception as e:
+        abort(400, message=str(e))
 
-    # Supabase may or may not return a session immediately.
-    # If a session is present, return the tokens; otherwise just inform the user.
-    session = resp.get("session")
-    user = resp.get("user")
 
     # setting up the cookies (only if a session was returned)
-    body = {"user": user}
+    body = {"user": user.model_dump()} if user else {}
     resp = make_response(jsonify(body), 200)
     secure_flag = not current_app.config.get("DEBUG", False)
 
@@ -62,7 +64,7 @@ def signup(data):
         # set up the access token
         resp.set_cookie(
             "access_token",
-            session.get("access_token"),
+            session.access_token,
             httponly=True,
             secure=secure_flag,
             samesite="Lax",
@@ -73,7 +75,7 @@ def signup(data):
         # set up the refresh token
         resp.set_cookie(
             "refresh_token",
-            session.get("refresh_token"),
+            session.refresh_token,
             httponly=True,
             secure=secure_flag,
             samesite="Lax",
@@ -98,26 +100,27 @@ def login(data):
     password = data["password"]
 
     supabase = supabase_client
-    resp = supabase.auth.sign_in_with_password(email=email, password=password)
-
-    if resp.get("error"):
-        abort(401, message=resp["error"]["message"])
-
-    session = resp.get("session")
-    user = resp.get("user")
+    try:
+        resp = supabase.auth.sign_in_with_password(
+            email=email, password=password
+        )
+        session = resp.session
+        user = resp.user
+    except Exception as e:
+        abort(400, message=str(e))
 
     if not session:
         # No session returned — something went wrong
         abort(500, message="Authentication succeeded but no session returned")
 
     # return user and set cookies
-    body = {"user": user}
+    body = {"user": user.model_dump()} if user else {}
     out = make_response(jsonify(body), 200)
     secure_flag = not current_app.config.get("DEBUG", False)
 
     out.set_cookie(
         "access_token",
-        session.get("access_token"),
+        session.access_token,
         httponly=True,
         secure=secure_flag,
         samesite="Lax",
@@ -127,7 +130,7 @@ def login(data):
 
     out.set_cookie(
         "refresh_token",
-        session.get("refresh_token"),
+        session.refresh_token,
         httponly=True,
         secure=secure_flag,
         samesite="Lax",
@@ -151,23 +154,22 @@ def refresh_token(data):
     if not refresh_token_value:
         abort(401, message="Refresh token missing")
 
-    resp = supabase.auth.refresh_session(refresh_token_value)
-
-    if resp.get("error"):
-        abort(401, message=resp["error"]["message"])
-
-    session = resp.get("session")
-    user = resp.get("user")
+    try:
+        resp = supabase.auth.refresh_session(refresh_token_value)
+        session = resp.session
+        user = resp.user
+    except Exception as e:
+        abort(401, message=str(e))
 
     if not session:
         abort(500, message="No session returned from refresh")
 
-    out = make_response(jsonify({"user": user}), 200)
+    out = make_response(jsonify({"user": user.model_dump() if user else {}}), 200)
     secure_flag = not current_app.config.get("DEBUG", False)
 
     out.set_cookie(
         "access_token",
-        session.get("access_token"),
+        session.access_token,
         httponly=True,
         secure=secure_flag,
         samesite="Lax",
@@ -177,7 +179,7 @@ def refresh_token(data):
 
     out.set_cookie(
         "refresh_token",
-        session.get("refresh_token"),
+        session.refresh_token,
         httponly=True,
         secure=secure_flag,
         samesite="Lax",
@@ -195,10 +197,10 @@ def refresh_token(data):
 @auth_blp.arguments(PasswordResetRequestSchema)
 def password_reset_request(data):
     supabase = supabase_client
-    resp = supabase.auth.reset_password_for_email(data["email"])
-
-    if resp.get("error"):
-        abort(400, message=resp["error"]["message"])
+    try:
+        supabase.auth.reset_password_for_email(data["email"])
+    except Exception as e:
+        abort(400, message=str(e))
 
     return jsonify({"message": "Password-reset email sent"}), 200
 
@@ -210,13 +212,13 @@ def password_reset_request(data):
 @auth_blp.arguments(PasswordResetConfirmSchema)
 def password_reset_confirm(data):
     supabase = supabase_client
-    resp = supabase.auth.update_user(
-        access_token=data["reset_token"],
-        password=data["new_password"],
-    )
-
-    if resp.get("error"):
-        abort(400, message=resp["error"]["message"])
+    try:
+        supabase.auth.update_user(
+            access_token=data["reset_token"],
+            data={"password": data["new_password"]},
+        )
+    except Exception as e:
+        abort(400, message=str(e))
 
     return jsonify({"message": "Password updated successfully"}), 200
 
@@ -246,11 +248,11 @@ def require_auth(f):
                 token = auth.split(" ", 1)[1]
         if not token:
             abort(401, message="Authentication required")
-        user_resp = supabase_client.auth.get_user(token)
-        if user_resp.get("error") or not user_resp.get("user"):
+        try:
+            user_resp = supabase_client.auth.get_user(token)
+            request.current_user = user_resp.user
+        except Exception:
             abort(401, message="Invalid or expired token")
-        # attach current user to request
-        request.current_user = user_resp.get("user")
         return f(*args, **kwargs)
     return wrapped
 
@@ -272,24 +274,20 @@ def verify_email(data):
 
     supabase = supabase_client
     
-    # Verify the code against Supabase Auth
-    resp = supabase.auth.verify_otp({
-        "email": email,
-        "token": token,
-        "type": otp_type
-    })
-
-    if resp.get("error"):
-        abort(400, message=resp["error"]["message"])
-
-    session = resp.get("session")
-    user = resp.get("user")
+    try:
+        resp = supabase.auth.verify_otp(
+            {"email": email, "token": token, "type": otp_type}
+        )
+        session = resp.session
+        user = resp.user
+    except Exception as e:
+        abort(400, message=str(e))
 
     if not session:
         return jsonify({"message": "Verification successful; no session created"}), 200
 
-    out = make_response(jsonify({"user": user}), 200)
+    out = make_response(jsonify({"user": user.model_dump() if user else {}}), 200)
     secure_flag = not current_app.config.get("DEBUG", False)
-    out.set_cookie("access_token", session.get("access_token"), httponly=True, secure=secure_flag, samesite="Lax", max_age=3600, path="/")
-    out.set_cookie("refresh_token", session.get("refresh_token"), httponly=True, secure=secure_flag, samesite="Lax", max_age=604800, path="/auth/refresh")
+    out.set_cookie("access_token", session.access_token, httponly=True, secure=secure_flag, samesite="Lax", max_age=3600, path="/")
+    out.set_cookie("refresh_token", session.refresh_token, httponly=True, secure=secure_flag, samesite="Lax", max_age=604800, path="/auth/refresh")
     return out

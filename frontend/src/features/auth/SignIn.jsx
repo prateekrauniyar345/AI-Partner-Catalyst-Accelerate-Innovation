@@ -28,10 +28,10 @@ export default function SignIn() {
       setError('Please enter a valid email address.')
       return
     }
-
     setLoading(true)
     try {
-      const data = await signin({ email, password })
+      const payload = { email, password }
+      const data = await signin(payload)
       // signin returns user info; tokens set as HttpOnly cookies
       navigate('/')
     } catch (err) {
@@ -91,7 +91,10 @@ export default function SignIn() {
                 <a href="#" className="small">Forgot?</a>
               </div>
 
-              <Button type="submit" className="w-100 mb-2" disabled={loading} style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)', border: 'none' }}>
+              <Button type="submit" 
+                className="w-100 mb-2" 
+                disabled={loading} 
+                style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)', border: 'none' }}>
                 {loading ? 'Signing in…' : 'Sign in'}
               </Button>
             </form>

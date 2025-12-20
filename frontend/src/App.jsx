@@ -4,6 +4,7 @@ import SignIn from './features/auth/SignIn'
 import SignUp from './features/auth/SignUp'
 import Dashboard from './pages/Dashboard'
 import Navbar from './components/dashboard/Navbar'
+import VerifyEmail from './features/auth/VerifyEmail'
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/verify" element={<VerifyEmail />} />
       </Routes>
     </>
   )

@@ -8,6 +8,7 @@ export default function SignUp() {
   const navigate = useNavigate()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -20,7 +21,7 @@ export default function SignUp() {
   }
 
   function validate() {
-    if (!firstName || !email || !password) return 'Please fill required fields.'
+    if (!firstName || !username || !email || !password) return 'Please fill required fields.'
     if (password.length < 6) return 'Password must be at least 6 characters.'
     if (password !== confirm) return "Passwords don't match."
     return ''
@@ -37,16 +38,17 @@ export default function SignUp() {
 
     setLoading(true)
     try {
-      const payload = { first_name: firstName, last_name: lastName, email, password }
+      const payload = { first_name: firstName, last_name: lastName, username, email, password }
       const data = await signup(payload)
       // signup may require email verification; if session was created cookies are set
-      if (data && data.user) {
+      console.log("Signup response data:", data);
+      if (data && (data.session || data.access_token || data.user?.confirmed_at || data.user?.email_confirmed_at)) {
         navigate('/')
       } else {
         // likely requires email confirmation
         setSuccess('Signup successful — please check your email to confirm your account.')
         // optionally redirect to signin after brief delay
-        setTimeout(() => navigate('/signin'), 2500)
+        navigate(`/verify?email=${encodeURIComponent(email)}`)
       }
     } catch {
       setError('Sign up failed — please check your details and try again.')
@@ -61,8 +63,8 @@ export default function SignUp() {
 
   return (
     <>
-      <div className="d-flex align-items-center justify-content-center min-vh-100" style={{ background: '#fff' }}>
-        <div className="card shadow-sm" style={{ width: 520, borderRadius: 12 }}>
+      <div className="mt-4 d-flex align-items-center justify-content-center min-vh-100" style={{ background: '#fff' }}>
+        <div className="mt-4 card shadow-sm" style={{ width: 520, borderRadius: 12 }}>
           <div className="card-body p-4">
             
             {/* top nav is provided by App; footer shown below */}
@@ -74,17 +76,22 @@ export default function SignUp() {
               <div className="row">
                 <div className="col mb-3">
                   <label className="form-label">First name</label>
-                  <input className="form-control" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                  <input className="form-control" value={firstName} placeholder='John' onChange={(e) => setFirstName(e.target.value)} />
                 </div>
                 <div className="col mb-3">
                   <label className="form-label">Last name</label>
-                  <input className="form-control" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                  <input className="form-control" value={lastName} placeholder='Doe' onChange={(e) => setLastName(e.target.value)} />
                 </div>
               </div>
 
               <div className="mb-3">
+                <label className="form-label">Username</label>
+                <input className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="username" />
+              </div>
+
+              <div className="mb-3">
                 <label className="form-label">Email</label>
-                <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input type="email" className="form-control" value={email} placeholder="you@domain.com" onChange={(e) => setEmail(e.target.value)} />
               </div>
 
               <div className="mb-3">
