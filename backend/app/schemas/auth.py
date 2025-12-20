@@ -48,3 +48,10 @@ class PasswordResetConfirmSchema(Schema):
         validate=validate.Length(min=8),
         load_only=True,
     )
+
+
+class VerifyOTPSchema(Schema):
+    """Payload to verify the email code."""
+    email = fields.Email(required=True)
+    token = fields.Str(required=True) # The 6-digit code from email
+    type = fields.Str(load_default="signup")

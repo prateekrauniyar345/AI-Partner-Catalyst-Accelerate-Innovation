@@ -8,6 +8,7 @@ from ..schemas.auth import (
     RefreshTokenSchema,
     PasswordResetRequestSchema,
     PasswordResetConfirmSchema,
+    VerifyOTPSchema,
 )
 from ..auth.supabase_client import supabase_client
 
@@ -35,9 +36,14 @@ def signup(data):
     email = data["email"]
     password = data["password"]
 
-    supabase = supabase_client()
-    resp = supabase.auth.sign_up(email=email, password=password)
+    user_metadata = {
+        "first_name": data.get("first_name"),
+        "last_name": data.get("last_name"),
+        "username": data.get("username"),
+    }
 
+    supabase = supabase_client
+    resp = supabase.auth.sign_up(email=email, password=password, options={"data": user_metadata})
     if resp.get("error"):
         abort(400, message=resp["error"]["message"])
 
@@ -72,7 +78,7 @@ def login(data):
     email = data["email"]
     password = data["password"]
 
-    supabase = supabase_client()
+    supabase = supabase_client
     resp = supabase.auth.sign_in_with_password(email=email, password=password)
 
     if resp.get("error"):
@@ -97,7 +103,7 @@ def login(data):
 @auth_blp.arguments(RefreshTokenSchema)
 @auth_blp.response(200, TokenResponseSchema)
 def refresh_token(data):
-    supabase = supabase_client()
+    supabase = supabase_client
     resp = supabase.auth.refresh_session(data["refresh_token"])
 
     if resp.get("error"):
@@ -120,7 +126,7 @@ def refresh_token(data):
 @auth_blp.post("/password-reset/request")
 @auth_blp.arguments(PasswordResetRequestSchema)
 def password_reset_request(data):
-    supabase = supabase_client()
+    supabase = supabase_client
     resp = supabase.auth.reset_password_for_email(data["email"])
 
     if resp.get("error"):
@@ -135,7 +141,7 @@ def password_reset_request(data):
 @auth_blp.post("/password-reset/confirm")
 @auth_blp.arguments(PasswordResetConfirmSchema)
 def password_reset_confirm(data):
-    supabase = supabase_client()
+    supabase = supabase_client
     resp = supabase.auth.update_user(
         access_token=data["reset_token"],
         password=data["new_password"],
@@ -145,3 +151,42 @@ def password_reset_confirm(data):
         abort(400, message=resp["error"]["message"])
 
     return jsonify({"message": "Password updated successfully"}), 200
+
+
+# -------------------------------------
+# Verify OTP (email code)
+# -------------------------------------
+@auth_blp.post("/verify")
+@auth_blp.arguments(VerifyOTPSchema)
+@auth_blp.response(200, TokenResponseSchema)
+def verify_email(data):
+    """
+    Verify the 6-digit OTP sent to the user's email.
+    If successful, the user is confirmed and logged in.
+    """
+    email = data["email"]
+    token = data["token"]
+    otp_type = data["type"]
+
+    supabase = supabase_client
+    
+    # Verify the code against Supabase Auth
+    resp = supabase.auth.verify_otp({
+        "email": email,
+        "token": token,
+        "type": otp_type
+    })
+
+    if resp.get("error"):
+        abort(400, message=resp["error"]["message"])
+
+    session = resp.get("session")
+    user = resp.get("user")
+
+    return {
+        "access_token": session["access_token"],
+        "refresh_token": session["refresh_token"],
+        "token_type": "bearer",
+        "expires_in": 3600,
+        "user": user,
+    }
