@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Menu, X, Accessibility } from 'lucide-react';
 import { Button } from '../../UI/button';
 
-export default function Navbar({ onStartLearning, onOpenSignIn, onOpenSignUp }) {
+export default function Navbar({ onStartLearning }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -26,7 +28,7 @@ export default function Navbar({ onStartLearning, onOpenSignIn, onOpenSignUp }) 
           <div
             className="d-flex align-items-center"
             style={{ cursor: 'pointer' }}
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={() => window.location.href='/' }
           >
             <div className="rounded d-flex align-items-center justify-content-center" style={{ width: 40, height: 40, background: 'linear-gradient(90deg,#7c3aed,#ec4899)', borderRadius: '8px' }}>
               <Mic style={{ width: '20px', height: '20px', color: 'white' }} />
@@ -65,7 +67,7 @@ export default function Navbar({ onStartLearning, onOpenSignIn, onOpenSignUp }) 
               type="button"
               className="btn btn-link text-decoration-none"
               style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
-              onClick={(e) => { e.preventDefault(); onOpenSignIn && onOpenSignIn(); }}
+              onClick={(e) => { e.preventDefault(); navigate('/signin'); }}
             >
               Sign In
             </button>
@@ -73,7 +75,7 @@ export default function Navbar({ onStartLearning, onOpenSignIn, onOpenSignUp }) 
               type="button"
               className="btn btn-link text-decoration-none"
               style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
-              onClick={(e) => { e.preventDefault(); onOpenSignUp && onOpenSignUp(); }}
+              onClick={(e) => { e.preventDefault(); navigate('/signup'); }}
             >
               Sign Up
             </button>
@@ -133,14 +135,14 @@ export default function Navbar({ onStartLearning, onOpenSignIn, onOpenSignUp }) 
                 <button
                   type="button"
                   className="btn btn-outline-secondary w-100"
-                  onClick={() => { setIsMobileMenuOpen(false); onOpenSignIn && onOpenSignIn(); }}
+                  onClick={() => { setIsMobileMenuOpen(false); navigate('/signin'); }}
                 >
                   Sign In
                 </button>
                 <button
                   type="button"
                   className="btn btn-outline-secondary w-100"
-                  onClick={() => { setIsMobileMenuOpen(false); onOpenSignUp && onOpenSignUp(); }}
+                  onClick={() => { setIsMobileMenuOpen(false); navigate('/signup'); }}
                 >
                   Sign Up
                 </button>

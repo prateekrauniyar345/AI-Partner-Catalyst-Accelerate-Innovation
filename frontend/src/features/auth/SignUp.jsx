@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
-import Navbar from '../../components/dashboard/Navbar';
+import { Footer } from '../../components/dashboard/Footer'
+import { signup } from '../../services/authServices'
 
 export default function SignUp() {
   const navigate = useNavigate()
@@ -12,6 +13,11 @@ export default function SignUp() {
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  function isValidEmail(val) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+  }
 
   function validate() {
     if (!firstName || !email || !password) return 'Please fill required fields.'
@@ -23,27 +29,27 @@ export default function SignUp() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setSuccess('')
     const v = validate()
     if (v) { setError(v); return }
 
+    if (!isValidEmail(email)) { setError('Please enter a valid email address.'); return }
+
     setLoading(true)
     try {
-      const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName, email, password })
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data?.message || 'Sign up failed')
-        setLoading(false)
-        return
+      const payload = { first_name: firstName, last_name: lastName, email, password }
+      const data = await signup(payload)
+      // signup may require email verification; if session was created cookies are set
+      if (data && data.user) {
+        navigate('/')
+      } else {
+        // likely requires email confirmation
+        setSuccess('Signup successful — please check your email to confirm your account.')
+        // optionally redirect to signin after brief delay
+        setTimeout(() => navigate('/signin'), 2500)
       }
-
-      if (data.token) localStorage.setItem('token', data.token)
-      navigate('/')
     } catch {
-      setError('Network error — try again.')
+      setError('Sign up failed — please check your details and try again.')
     } finally {
       setLoading(false)
     }
@@ -54,61 +60,64 @@ export default function SignUp() {
   }
 
   return (
-    <div className="d-flex align-items-center justify-content-center min-vh-100" style={{ background: '#fff' }}>
-      <div className="card shadow-sm" style={{ width: 520, borderRadius: 12 }}>
-        <div className="card-body p-4">
-          
-          {/* Navbar */}
-          <Navbar />
+    <>
+      <div className="d-flex align-items-center justify-content-center min-vh-100" style={{ background: '#fff' }}>
+        <div className="card shadow-sm" style={{ width: 520, borderRadius: 12 }}>
+          <div className="card-body p-4">
+            
+            {/* top nav is provided by App; footer shown below */}
 
-          {error && <div className="alert alert-danger py-2">{error}</div>}
+            {error && <div className="alert alert-danger py-2">{error}</div>}
+            {success && <div className="alert alert-success py-2">{success}</div>}
 
-          <form onSubmit={handleSubmit}>
-            <div className="row">
-              <div className="col mb-3">
-                <label className="form-label">First name</label>
-                <input className="form-control" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            <form onSubmit={handleSubmit}>
+              <div className="row">
+                <div className="col mb-3">
+                  <label className="form-label">First name</label>
+                  <input className="form-control" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                </div>
+                <div className="col mb-3">
+                  <label className="form-label">Last name</label>
+                  <input className="form-control" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                </div>
               </div>
-              <div className="col mb-3">
-                <label className="form-label">Last name</label>
-                <input className="form-control" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+
+              <div className="mb-3">
+                <label className="form-label">Email</label>
+                <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
+
+              <div className="mb-3">
+                <label className="form-label">Password</label>
+                <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Confirm password</label>
+                <input type="password" className="form-control" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+              </div>
+
+              <Button type="submit" className="w-100 mb-3" disabled={loading} style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)', border: 'none' }}>
+                {loading ? 'Creating account…' : 'Create account'}
+              </Button>
+            </form>
+
+            <div className="text-center mb-2">
+              <small className="text-muted">or create account with</small>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Email</label>
-              <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <div className="d-grid gap-2">
+              <Button variant="outline-secondary" onClick={handleGoogle}>
+                <i className="bi bi-google me-2" /> Continue with Google
+              </Button>
+              <Button variant="outline-secondary" onClick={() => navigate('/signin')}>
+                Already have an account? Sign in
+              </Button>
             </div>
-
-            <div className="mb-3">
-              <label className="form-label">Password</label>
-              <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Confirm password</label>
-              <input type="password" className="form-control" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
-            </div>
-
-            <Button type="submit" className="w-100 mb-3" disabled={loading} style={{ background: 'linear-gradient(90deg,#7c3aed,#ec4899)', border: 'none' }}>
-              {loading ? 'Creating account…' : 'Create account'}
-            </Button>
-          </form>
-
-          <div className="text-center mb-2">
-            <small className="text-muted">or create account with</small>
-          </div>
-
-          <div className="d-grid gap-2">
-            <Button variant="outline-secondary" onClick={handleGoogle}>
-              <i className="bi bi-google me-2" /> Continue with Google
-            </Button>
-            <Button variant="outline-secondary" onClick={() => navigate('/signin')}>
-              Already have an account? Sign in
-            </Button>
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   )
 }

@@ -1,18 +1,15 @@
 import './App.css'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import SignIn from './features/auth/SignIn'
 import SignUp from './features/auth/SignUp'
 import Dashboard from './pages/Dashboard'
+import Navbar from './components/dashboard/Navbar'
 
 
 function App() {
   return (
     <>
-      <nav className="navbar navbar-light bg-light">
-        <div className="container">
-          <Link to="/" className="navbar-brand">VoiceEd Ally</Link>
-        </div>
-      </nav>
+      <Navbar />
 
       <Routes>
         <Route path="/" element={<Dashboard />} />

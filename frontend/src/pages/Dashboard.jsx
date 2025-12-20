@@ -7,26 +7,23 @@ import { Impact } from '../components/dashboard/Impact'
 import { CTA } from '../components/dashboard/CTA'
 import { Footer } from '../components/dashboard/Footer'
 import { VoiceInterface } from '../components/dashboard/VoiceInterface'
-import SignInModal from '../features/auth/SignInModal'
-import SignUpModal from '../features/auth/SignUpModal'
+// sign-in / sign-up are now dedicated pages at /signin and /signup
 
 export default function Dashboard() {
   const [voiceOpen, setVoiceOpen] = useState(false)
-  const [signInOpen, setSignInOpen] = useState(false)
-  const [signUpOpen, setSignUpOpen] = useState(false)
+  // sign-in and sign-up are handled on dedicated routes now
 
   function handleStartLearning() {
     // For now open the voice session modal
     setVoiceOpen(true)
   }
 
-  function openSignIn() { setSignInOpen(true) }
-  function openSignUp() { setSignUpOpen(true) }
+  // navigation to sign in / sign up is handled by the Navbar
 
   return (
     <div className="min-vh-100 bg-white text-dark">
       <a className="visually-hidden" href="#main">Skip to content</a>
-      <Navbar onStartLearning={handleStartLearning} onOpenSignIn={openSignIn} onOpenSignUp={openSignUp} />
+      <Navbar onStartLearning={handleStartLearning} />
       <main id="main">
         <Hero onStartLearning={handleStartLearning} />
         <section id="features">
@@ -44,8 +41,6 @@ export default function Dashboard() {
       {voiceOpen && (
         <VoiceInterface onClose={() => setVoiceOpen(false)} />
       )}
-      <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} onSuccess={() => { /* optionally refresh UI */ }} />
-      <SignUpModal open={signUpOpen} onClose={() => setSignUpOpen(false)} onSuccess={() => { /* optionally refresh UI */ }} />
     </div>
   )
 }
