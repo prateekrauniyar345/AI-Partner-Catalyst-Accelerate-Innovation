@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, current_app, make_response, request
 from flask_smorest import abort
 from flask_smorest import Blueprint as SmorestBlueprint
 from ..schemas.auth import (
@@ -11,6 +11,7 @@ from ..schemas.auth import (
     VerifyOTPSchema,
 )
 from ..auth.supabase_client import supabase_client
+from functools import wraps
 
 
 auth_blp = SmorestBlueprint(
@@ -52,17 +53,35 @@ def signup(data):
     session = resp.get("session")
     user = resp.get("user")
 
+    # setting up the cookies (only if a session was returned)
+    body = {"user": user}
+    resp = make_response(jsonify(body), 200)
+    secure_flag = not current_app.config.get("DEBUG", False)
+
     if session:
-        return {
-            "access_token": session["access_token"],
-            "refresh_token": session["refresh_token"],
-            "token_type": "bearer",
-            "expires_in": 3600,
-            "user": user,
-        }
-    else:
-        # No session yet – email confirmation required.
-        return jsonify({"message": "Signup email sent - please confirm your address"}), 201
+        # set up the access token
+        resp.set_cookie(
+            "access_token",
+            session.get("access_token"),
+            httponly=True,
+            secure=secure_flag,
+            samesite="Lax",
+            max_age=3600,
+            path="/",
+        )
+
+        # set up the refresh token
+        resp.set_cookie(
+            "refresh_token",
+            session.get("refresh_token"),
+            httponly=True,
+            secure=secure_flag,
+            samesite="Lax",
+            max_age=604800,
+            path="/auth/refresh",
+        )
+
+    return resp
 
 
 # -------------------------------------
@@ -84,16 +103,39 @@ def login(data):
     if resp.get("error"):
         abort(401, message=resp["error"]["message"])
 
-    session = resp["session"]
-    user = resp["user"]
+    session = resp.get("session")
+    user = resp.get("user")
 
-    return {
-        "access_token": session["access_token"],
-        "refresh_token": session["refresh_token"],
-        "token_type": "bearer",
-        "expires_in": 3600,
-        "user": user,
-    }
+    if not session:
+        # No session returned — something went wrong
+        abort(500, message="Authentication succeeded but no session returned")
+
+    # return user and set cookies
+    body = {"user": user}
+    out = make_response(jsonify(body), 200)
+    secure_flag = not current_app.config.get("DEBUG", False)
+
+    out.set_cookie(
+        "access_token",
+        session.get("access_token"),
+        httponly=True,
+        secure=secure_flag,
+        samesite="Lax",
+        max_age=3600,
+        path="/",
+    )
+
+    out.set_cookie(
+        "refresh_token",
+        session.get("refresh_token"),
+        httponly=True,
+        secure=secure_flag,
+        samesite="Lax",
+        max_age=604800,
+        path="/auth/refresh",
+    )
+
+    return out
 
 
 # -------------------------------------
@@ -104,20 +146,46 @@ def login(data):
 @auth_blp.response(200, TokenResponseSchema)
 def refresh_token(data):
     supabase = supabase_client
-    resp = supabase.auth.refresh_session(data["refresh_token"])
+    # prefer cookie then payload
+    refresh_token_value = request.cookies.get("refresh_token") or data.get("refresh_token")
+    if not refresh_token_value:
+        abort(401, message="Refresh token missing")
+
+    resp = supabase.auth.refresh_session(refresh_token_value)
 
     if resp.get("error"):
         abort(401, message=resp["error"]["message"])
 
-    session = resp["session"]
-    user = resp["user"]
-    return {
-        "access_token": session["access_token"],
-        "refresh_token": session["refresh_token"],
-        "token_type": "bearer",
-        "expires_in": 3600,
-        "user": user,
-    }
+    session = resp.get("session")
+    user = resp.get("user")
+
+    if not session:
+        abort(500, message="No session returned from refresh")
+
+    out = make_response(jsonify({"user": user}), 200)
+    secure_flag = not current_app.config.get("DEBUG", False)
+
+    out.set_cookie(
+        "access_token",
+        session.get("access_token"),
+        httponly=True,
+        secure=secure_flag,
+        samesite="Lax",
+        max_age=3600,
+        path="/",
+    )
+
+    out.set_cookie(
+        "refresh_token",
+        session.get("refresh_token"),
+        httponly=True,
+        secure=secure_flag,
+        samesite="Lax",
+        max_age=604800,
+        path="/auth/refresh",
+    )
+
+    return out
 
 
 # -------------------------------------
@@ -154,6 +222,40 @@ def password_reset_confirm(data):
 
 
 # -------------------------------------
+# Sign-out
+# -------------------------------------
+@auth_blp.post("/signout")
+def signout():
+    out = make_response(jsonify({"message": "signed out"}), 200)
+    secure_flag = not current_app.config.get("DEBUG", False)
+    out.set_cookie("access_token", "", expires=0, httponly=True, secure=secure_flag, samesite="Lax", path="/")
+    out.set_cookie("refresh_token", "", expires=0, httponly=True, secure=secure_flag, samesite="Lax", path="/auth/refresh")
+    return out
+
+
+# -------------------------------------
+# Auth decorator
+# -------------------------------------
+def require_auth(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        token = request.cookies.get("access_token")
+        if not token:
+            auth = request.headers.get("Authorization", "")
+            if auth.startswith("Bearer "):
+                token = auth.split(" ", 1)[1]
+        if not token:
+            abort(401, message="Authentication required")
+        user_resp = supabase_client.auth.get_user(token)
+        if user_resp.get("error") or not user_resp.get("user"):
+            abort(401, message="Invalid or expired token")
+        # attach current user to request
+        request.current_user = user_resp.get("user")
+        return f(*args, **kwargs)
+    return wrapped
+
+
+# -------------------------------------
 # Verify OTP (email code)
 # -------------------------------------
 @auth_blp.post("/verify")
@@ -183,10 +285,11 @@ def verify_email(data):
     session = resp.get("session")
     user = resp.get("user")
 
-    return {
-        "access_token": session["access_token"],
-        "refresh_token": session["refresh_token"],
-        "token_type": "bearer",
-        "expires_in": 3600,
-        "user": user,
-    }
+    if not session:
+        return jsonify({"message": "Verification successful; no session created"}), 200
+
+    out = make_response(jsonify({"user": user}), 200)
+    secure_flag = not current_app.config.get("DEBUG", False)
+    out.set_cookie("access_token", session.get("access_token"), httponly=True, secure=secure_flag, samesite="Lax", max_age=3600, path="/")
+    out.set_cookie("refresh_token", session.get("refresh_token"), httponly=True, secure=secure_flag, samesite="Lax", max_age=604800, path="/auth/refresh")
+    return out
