@@ -90,7 +90,7 @@ def signup(data):
             secure=secure_flag,
             samesite="Lax",
             max_age=604800,
-            path="/auth/refresh",
+            path="/",
         )
 
     return resp
@@ -146,7 +146,7 @@ def login(data):
         secure=secure_flag,
         samesite="Lax",
         max_age=604800,
-        path="/auth/refresh",
+        path="/",
     )
 
     return out
@@ -195,7 +195,7 @@ def refresh_token(data):
         secure=secure_flag,
         samesite="Lax",
         max_age=604800,
-        path="/auth/refresh",
+        path="/",
     )
 
     return out
@@ -239,7 +239,7 @@ def signout():
     out = make_response(jsonify({"message": "signed out"}), 200)
     secure_flag = not current_app.config.get("DEBUG", False)
     out.set_cookie("access_token", "", expires=0, httponly=True, secure=secure_flag, samesite="Lax", path="/")
-    out.set_cookie("refresh_token", "", expires=0, httponly=True, secure=secure_flag, samesite="Lax", path="/auth/refresh")
+    out.set_cookie("refresh_token", "", expires=0, httponly=True, secure=secure_flag, samesite="Lax", path="/")
     return out
 
 

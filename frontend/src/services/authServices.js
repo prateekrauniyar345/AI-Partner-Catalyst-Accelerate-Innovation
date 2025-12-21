@@ -1,4 +1,6 @@
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
+// Use a relative API base by default so Vite dev proxy forwards requests
+// to the backend and cookies are same-origin during development.
+const API = import.meta.env.VITE_API_URL ?? ''
 console.log("API URL:", API);
 
 
@@ -138,5 +140,21 @@ export async function confirmPasswordReset(payload) {
   const data = await res.json();
   if (!res.ok) throw data;
   return data;
+}
+
+
+// -------------------------------
+// me function - get current authenticated user
+// -------------------------------
+export async function me() {
+  const res = await fetch(`${API}/auth/me`, {
+    method: 'GET',
+    credentials: 'include',
+  })
+  // try to parse json/text for helpful errors
+  const contentType = res.headers.get('content-type') || ''
+  const data = contentType.includes('application/json') ? await res.json() : await res.text()
+  if (!res.ok) throw data
+  return data
 }
 

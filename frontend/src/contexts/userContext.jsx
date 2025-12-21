@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { me as fetchMeService, refreshToken as refreshTokenService } from '../services/authServices'
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
+// Use relative API (Vite proxy) by default via `authServices` helpers
 
 const UserContext = createContext(null)
 
@@ -12,16 +13,28 @@ export function UserProvider({ children }) {
     let mounted = true
     async function fetchMe() {
       try {
-        const res = await fetch(`${API}/auth/me`, { method: 'GET', credentials: 'include' })
-        if (!mounted) return
-        if (!res.ok) {
-          setUser(null)
-          return
-        }
-        const data = await res.json()
-        setUser(data)
+        const data = await fetchMeService()
+        // service may return {user:...} or direct object
+        const userPayload = data && data.user ? data.user : data
+        console.debug('/auth/me payload', userPayload)
+        setUser(userPayload)
+        return
       } catch (err) {
-        console.warn('Failed to fetch /auth/me', err)
+        console.debug('/auth/me failed', err)
+        // if the error looks like 401, attempt a refresh + retry
+        try {
+          const refreshed = await refreshTokenService().catch(() => null)
+          console.debug('/auth/refresh result', refreshed)
+          if (refreshed) {
+            const data2 = await fetchMeService()
+            const userPayload2 = data2 && data2.user ? data2.user : data2
+            console.debug('/auth/me payload after refresh', userPayload2)
+            setUser(userPayload2)
+            return
+          }
+        } catch (err2) {
+          console.warn('Refresh + retry failed', err2)
+        }
         setUser(null)
       }
     }
