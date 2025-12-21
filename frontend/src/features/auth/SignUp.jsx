@@ -5,19 +5,29 @@ import { Footer } from '../../components/dashboard/Footer'
 import { signup } from '../../services/authServices'
 
 export default function SignUp() {
-  const navigate = useNavigate()
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+
+export default function SignUp() {
+
+  // Passkey/Auth0 removed — fallback to standard signup for now
+
+  const navigate = useNavigate();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   function isValidEmail(val) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+  }
+
+  function handlePasskeySignup() {
+    // Redirect user to normal signup flow (passkeys disabled)
+    navigate('/signup')
   }
 
   function validate() {
@@ -117,6 +127,12 @@ export default function SignUp() {
               <Button variant="outline-secondary" onClick={handleGoogle}>
                 <i className="bi bi-google me-2" /> Continue with Google
               </Button>
+
+              <Button variant="outline-secondary" onClick={handlePasskeySignup}>
+                Continue with Passkey / Face ID
+              </Button>
+
+
               <Button variant="outline-secondary" onClick={() => navigate('/signin')}>
                 Already have an account? Sign in
               </Button>

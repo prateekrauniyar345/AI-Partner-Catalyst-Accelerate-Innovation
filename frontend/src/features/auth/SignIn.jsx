@@ -5,14 +5,24 @@ import { Footer } from '../../components/dashboard/Footer'
 import { signin } from '../../services/authServices'
 import { useUser } from '../../contexts/userContext'
 
+// signiin with auth0
+// Auth0 removed — passkey/login handled by our app later
+
 export default function SignIn() {
-  const navigate = useNavigate()
-  const { login } = useUser()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+
+  const navigate = useNavigate();
+  const { login } = useUser();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+
+  function handlePasskeyLogin() {
+    // Passkey/Auth0 removed — redirect user to signup page for now
+    navigate('/signup')
+  }
 
   function isValidEmail(val) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
@@ -112,6 +122,11 @@ export default function SignIn() {
               <Button variant="outline-secondary" onClick={handleGoogle}>
                 <i className="bi bi-google me-2" /> Continue with Google
               </Button>
+
+              <Button variant="outline-secondary" onClick={handlePasskeyLogin}>
+                Continue with Passkey / Face ID
+              </Button>
+
               <Button variant="outline-secondary" onClick={() => navigate('/signup')}>
                 Create an account
               </Button>

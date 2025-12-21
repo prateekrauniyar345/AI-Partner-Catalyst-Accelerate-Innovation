@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { me as fetchMeService, refreshToken as refreshTokenService, signout as signoutService } from '../services/authServices'
-
 // Use relative API (Vite proxy) by default via `authServices` helpers
 
 const UserContext = createContext(null)
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(null);
+ 
+  
 
   // On mount, fetch current user from backend using cookies (no localStorage)
   useEffect(() => {
@@ -17,7 +18,7 @@ export function UserProvider({ children }) {
         // service may return {user:...} or direct object
         const userPayload = data && data.user ? data.user : data
         console.debug('/auth/me payload', userPayload)
-        setUser(userPayload)
+        if (mounted) setUser(userPayload)
         return
       } catch (err) {
         console.debug('/auth/me failed', err)
@@ -29,7 +30,7 @@ export function UserProvider({ children }) {
             const data2 = await fetchMeService()
             const userPayload2 = data2 && data2.user ? data2.user : data2
             console.debug('/auth/me payload after refresh', userPayload2)
-            setUser(userPayload2)
+            if (mounted) setUser(userPayload2)
             return
           }
         } catch (err2) {
