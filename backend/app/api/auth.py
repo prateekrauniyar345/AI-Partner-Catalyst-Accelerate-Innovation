@@ -1,3 +1,4 @@
+# File: backend/app/api/auth.py
 from flask import Blueprint, jsonify, current_app, make_response, request
 from flask_smorest import abort
 from flask_smorest import Blueprint as SmorestBlueprint
