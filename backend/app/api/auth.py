@@ -36,29 +36,44 @@ def signup(data):
     client receives a generic message).
     """
     email = data["email"]
+    print("Signup email:", email)
     password = data["password"]
+    print("Signup password:", "*" * len(password))  
 
     user_metadata = {
         "first_name": data.get("first_name"),
         "last_name": data.get("last_name"),
         "username": data.get("username"),
     }
+    print("User metadata:", user_metadata)
 
     supabase = supabase_client
     try:
+        # this is where we call Supabase to create the user
         resp = supabase.auth.sign_up(
-            {"email": email, "password": password, "options": {"data": user_metadata}}
-        )
-        session = resp.session
-        user = resp.user
+            {
+                "email": email, 
+                "password": password, 
+                "options": {
+                    "data": user_metadata, 
+                    "email_redirect_to": f"{current_app.config.get('FRONTEND_REDIRECT_URL')}/signin"
+                }
+            }
+           )
+        print("Supabase sign-up response:", resp)
     except Exception as e:
         abort(400, message=str(e))
 
+    user = resp.user
+    print("Created user:", user)
+    session = resp.session
+    print("Session info:", session)
 
     # setting up the cookies (only if a session was returned)
     body = {"user": user.model_dump()} if user else {}
     resp = make_response(jsonify(body), 200)
     secure_flag = not current_app.config.get("DEBUG", False)
+    print("Secure flag for cookies:", secure_flag)
 
     if session:
         # set up the access token
@@ -101,9 +116,10 @@ def login(data):
 
     supabase = supabase_client
     try:
-        resp = supabase.auth.sign_in_with_password(
-            email=email, password=password
-        )
+        resp = supabase.auth.sign_in_with_password({
+            "email": email,
+            "password": password
+        })
         session = resp.session
         user = resp.user
     except Exception as e:
@@ -213,10 +229,7 @@ def password_reset_request(data):
 def password_reset_confirm(data):
     supabase = supabase_client
     try:
-        supabase.auth.update_user(
-            access_token=data["reset_token"],
-            data={"password": data["new_password"]},
-        )
+        supabase.auth.update_user({"password": data["new_password"]})
     except Exception as e:
         abort(400, message=str(e))
 

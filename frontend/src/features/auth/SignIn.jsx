@@ -32,6 +32,7 @@ export default function SignIn() {
     try {
       const payload = { email, password }
       const data = await signin(payload)
+      console.log("Signin response data:", data);
       // signin returns user info; tokens set as HttpOnly cookies
       navigate('/')
     } catch (err) {
