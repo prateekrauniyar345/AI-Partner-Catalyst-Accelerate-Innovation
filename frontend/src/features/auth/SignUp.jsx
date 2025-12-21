@@ -6,8 +6,6 @@ import { signup } from '../../services/authServices'
 
 export default function SignUp() {
 
-export default function SignUp() {
-
   // Passkey/Auth0 removed — fallback to standard signup for now
 
   const navigate = useNavigate();
