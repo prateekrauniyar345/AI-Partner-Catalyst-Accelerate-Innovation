@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Menu, X, Accessibility } from 'lucide-react';
+import { useUser } from '../../contexts/userContext'
 import { Button } from '../../UI/button';
 
 export default function Navbar({ onStartLearning }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, signOut } = useUser()
   const navigate = useNavigate();
 
 
@@ -78,8 +79,7 @@ export default function Navbar({ onStartLearning }) {
                   className="btn btn-link text-decoration-none"
                   style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
                   onClick={() => {
-                    try { localStorage.removeItem('user') } catch (e) {}
-                    setUser(null)
+                    signOut()
                     navigate('/')
                   }}
                 >
@@ -168,7 +168,7 @@ export default function Navbar({ onStartLearning }) {
                     <button
                       type="button"
                       className="btn btn-outline-secondary w-100"
-                      onClick={() => { setIsMobileMenuOpen(false); try { localStorage.removeItem('user') } catch (e) {} ; navigate('/'); }}
+                      onClick={() => { setIsMobileMenuOpen(false); signOut(); navigate('/'); }}
                     >
                       Sign Out
                     </button>

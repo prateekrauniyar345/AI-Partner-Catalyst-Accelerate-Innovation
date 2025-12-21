@@ -51,7 +51,7 @@ export async function signin(payload) {
 // ------------------------------- 
 // refreshToken function works as :
 // - takes no arguments
-// - makes POST request to /auth/refresh with refresh token from localStorage
+// - makes POST request to /auth/refresh relying on HttpOnly refresh cookie (no localStorage)
 // -------------------------------
 export async function refreshToken(refresh_token = null) {
   // If using HttpOnly refresh cookie, call without body and include credentials.

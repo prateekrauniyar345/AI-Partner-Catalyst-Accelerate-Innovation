@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import { Footer } from '../../components/dashboard/Footer'
 import { signin } from '../../services/authServices'
+import { useUser } from '../../contexts/userContext'
 
 export default function SignIn() {
   const navigate = useNavigate()
+  const { login } = useUser()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -33,16 +35,9 @@ export default function SignIn() {
       const payload = { email, password }
       const data = await signin(payload)
       console.log("Signin response data:", data);
-      // Persist user info for UI state (tokens are HttpOnly cookies)
-      // const user = data?.user || data
-      // if (user) {
-      //   try {
-      //     localStorage.setItem('user', JSON.stringify(user))
-      //   } catch (err) {
-      //     console.warn('Failed to persist user to localStorage', err)
-      //   }
-      // }
-      // signin returns user info; tokens set as HttpOnly cookies
+      // Persist user in context (tokens stored as HttpOnly cookies)
+      const user = data?.user || data
+      if (user) login(user)
       navigate('/')
     } catch (err) {
       // err may be a thrown response body from authServices
