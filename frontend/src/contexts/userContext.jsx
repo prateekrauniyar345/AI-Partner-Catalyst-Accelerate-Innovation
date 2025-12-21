@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { me as fetchMeService, refreshToken as refreshTokenService } from '../services/authServices'
+import { me as fetchMeService, refreshToken as refreshTokenService, signout as signoutService } from '../services/authServices'
 
 // Use relative API (Vite proxy) by default via `authServices` helpers
 
@@ -48,8 +48,10 @@ export function UserProvider({ children }) {
   }
 
   async function signOut() {
+    console.debug('Signing out user')
     try {
-      await fetch(`${API}/auth/signout`, { method: 'POST', credentials: 'include' })
+      await signoutService()
+      console.debug('signOut request successful')
     } catch (e) {
       console.warn('signOut request failed', e)
     }

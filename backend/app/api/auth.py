@@ -236,10 +236,44 @@ def password_reset_confirm(data):
 # -------------------------------------
 @auth_blp.post("/signout")
 def signout():
+    # Attempt to revoke session on Supabase (best-effort)
+    token = request.cookies.get("access_token")
+    try:
+        if token:
+            try:
+                supabase_client.auth.sign_out(token)
+            except Exception:
+                # older/newer SDKs may expose admin API differently
+                try:
+                    supabase_client.auth.api.sign_out(token)
+                except Exception:
+                    current_app.logger.debug("Supabase sign_out not available or failed")
+    except Exception as e:
+        current_app.logger.warning(f"Error revoking supabase session: {e}")
+
     out = make_response(jsonify({"message": "signed out"}), 200)
     secure_flag = not current_app.config.get("DEBUG", False)
-    out.set_cookie("access_token", "", expires=0, httponly=True, secure=secure_flag, samesite="Lax", path="/")
-    out.set_cookie("refresh_token", "", expires=0, httponly=True, secure=secure_flag, samesite="Lax", path="/")
+    # Clear cookies by setting empty value and immediate expiry
+    out.set_cookie(
+        "access_token", 
+        "", 
+        expires=0,
+        max_age=0, 
+        httponly=True, 
+        secure=secure_flag, 
+        samesite="Lax", 
+        path="/"
+        )
+    out.set_cookie(
+        "refresh_token", 
+        "",
+        expires=0,
+        max_age=0,
+        httponly=True,
+        secure=secure_flag,
+        samesite="Lax",
+        path="/"
+    )
     return out
 
 

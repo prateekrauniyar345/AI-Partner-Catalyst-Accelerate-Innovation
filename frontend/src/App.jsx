@@ -1,15 +1,18 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
+
 import SignIn from './features/auth/SignIn'
 import SignUp from './features/auth/SignUp'
 import Dashboard from './pages/Dashboard'
 import Navbar from './components/dashboard/Navbar'
 import VerifyEmail from './features/auth/VerifyEmail'
 
+import { UserProvider, useUser } from './contexts/userContext'
 
+function MainApp() {
+  const { user } = useUser() // optional if you don't use it yet
+  console.log(user)
 
-
-function App() {
   return (
     <>
       <Navbar />
@@ -24,4 +27,10 @@ function App() {
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <UserProvider>
+      <MainApp />
+    </UserProvider>
+  )
+}

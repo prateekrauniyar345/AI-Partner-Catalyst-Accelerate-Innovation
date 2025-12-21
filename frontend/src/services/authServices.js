@@ -158,3 +158,18 @@ export async function me() {
   return data
 }
 
+
+// -------------------------------
+// signout function - call backend to clear cookies/server session
+// -------------------------------
+export async function signout() {
+  const res = await fetch(`${API}/auth/signout`, {
+    method: 'POST',
+    credentials: 'include',
+  })
+  const contentType = res.headers.get('content-type') || ''
+  const data = contentType.includes('application/json') ? await res.json() : await res.text()
+  if (!res.ok) throw data
+  return data
+}
+
