@@ -13,6 +13,7 @@ from ..schemas.auth import (
 
 from ..auth.supabase_client import supabase_client
 from functools import wraps
+from ..models.users import UserSchema
 
 
 auth_blp = SmorestBlueprint(
@@ -36,16 +37,13 @@ def signup(data):
     client receives a generic message).
     """
     email = data["email"]
-    print("Signup email:", email)
     password = data["password"]
-    print("Signup password:", "*" * len(password))  
 
     user_metadata = {
         "first_name": data.get("first_name"),
         "last_name": data.get("last_name"),
         "username": data.get("username"),
     }
-    print("User metadata:", user_metadata)
 
     supabase = supabase_client
     try:
@@ -65,15 +63,12 @@ def signup(data):
         abort(400, message=str(e))
 
     user = resp.user
-    print("Created user:", user)
     session = resp.session
-    print("Session info:", session)
 
     # setting up the cookies (only if a session was returned)
     body = {"user": user.model_dump()} if user else {}
     resp = make_response(jsonify(body), 200)
     secure_flag = not current_app.config.get("DEBUG", False)
-    print("Secure flag for cookies:", secure_flag)
 
     if session:
         # set up the access token
@@ -263,6 +258,7 @@ def require_auth(f):
             abort(401, message="Authentication required")
         try:
             user_resp = supabase_client.auth.get_user(token)
+            print("Authenticated user:", user_resp)
             request.current_user = user_resp.user
         except Exception:
             abort(401, message="Invalid or expired token")
@@ -304,3 +300,42 @@ def verify_email(data):
     out.set_cookie("access_token", session.access_token, httponly=True, secure=secure_flag, samesite="Lax", max_age=3600, path="/")
     out.set_cookie("refresh_token", session.refresh_token, httponly=True, secure=secure_flag, samesite="Lax", max_age=604800, path="/auth/refresh")
     return out
+
+
+# -------------------------------------
+# Current user
+# -------------------------------------
+@auth_blp.get("/me")
+@auth_blp.response(200, UserSchema)
+@require_auth
+def me():
+    """Return the current authenticated user with explicit schema fields."""
+    user = getattr(request, "current_user", None)
+    if not user:
+        abort(401, message="Authentication required")
+
+    # Normalize user to a dict (works with pydantic-like or plain dict)
+    if hasattr(user, "model_dump"):
+        u = user.model_dump()
+    elif isinstance(user, dict):
+        u = user
+    else:
+        # fallback: read common attributes
+        u = {
+            "id": getattr(user, "id", None),
+            "email": getattr(user, "email", None),
+            "user_metadata": getattr(user, "user_metadata", None),
+        }
+
+    meta = u.get("user_metadata") or {}
+    # Some SDKs nest metadata under "user_metadata" or "raw_user_meta_data"
+    if not meta:
+        meta = u.get("raw_user_meta_data") or {}
+
+    return {
+        "id": u.get("id"),
+        "email": u.get("email"),
+        "first_name": meta.get("first_name"),
+        "last_name": meta.get("last_name"),
+        "username": meta.get("username"),
+    }

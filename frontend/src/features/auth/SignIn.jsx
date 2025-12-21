@@ -33,6 +33,15 @@ export default function SignIn() {
       const payload = { email, password }
       const data = await signin(payload)
       console.log("Signin response data:", data);
+      // Persist user info for UI state (tokens are HttpOnly cookies)
+      // const user = data?.user || data
+      // if (user) {
+      //   try {
+      //     localStorage.setItem('user', JSON.stringify(user))
+      //   } catch (err) {
+      //     console.warn('Failed to persist user to localStorage', err)
+      //   }
+      // }
       // signin returns user info; tokens set as HttpOnly cookies
       navigate('/')
     } catch (err) {

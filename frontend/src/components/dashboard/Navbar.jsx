@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Menu, X, Accessibility } from 'lucide-react';
@@ -6,7 +6,9 @@ import { Button } from '../../UI/button';
 
 export default function Navbar({ onStartLearning }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -63,22 +65,47 @@ export default function Navbar({ onStartLearning }) {
 
           {/* Action Buttons - Right */}
           <div className="d-none d-lg-flex align-items-center gap-2">
-            <button
-              type="button"
-              className="btn btn-link text-decoration-none"
-              style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
-              onClick={(e) => { e.preventDefault(); navigate('/signin'); }}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              className="btn btn-link text-decoration-none"
-              style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
-              onClick={(e) => { e.preventDefault(); navigate('/signup'); }}
-            >
-              Sign Up
-            </button>
+            {user ? (
+              <>
+                <div className="d-flex flex-column text-end me-2">
+                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#374151' }}>
+                    {user.username || user.user_metadata?.username || user.name || ''}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>{user.email}</div>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-link text-decoration-none"
+                  style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
+                  onClick={() => {
+                    try { localStorage.removeItem('user') } catch (e) {}
+                    setUser(null)
+                    navigate('/')
+                  }}
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="btn btn-link text-decoration-none"
+                  style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
+                  onClick={(e) => { e.preventDefault(); navigate('/signin'); }}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-link text-decoration-none"
+                  style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
+                  onClick={(e) => { e.preventDefault(); navigate('/signup'); }}
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
             <Button 
               onClick={onStartLearning} 
               className="btn text-white border-0 rounded" 
@@ -132,20 +159,38 @@ export default function Navbar({ onStartLearning }) {
                 </a>
               ))}
               <div className="mt-3 pt-3 border-top d-flex flex-column gap-2">
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary w-100"
-                  onClick={() => { setIsMobileMenuOpen(false); navigate('/signin'); }}
-                >
-                  Sign In
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary w-100"
-                  onClick={() => { setIsMobileMenuOpen(false); navigate('/signup'); }}
-                >
-                  Sign Up
-                </button>
+                {user ? (
+                  <>
+                    <div className="px-2">
+                      <div style={{ fontWeight: 600 }}>{user.username || user.name || ''}</div>
+                      <div className="small text-muted">{user.email}</div>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary w-100"
+                      onClick={() => { setIsMobileMenuOpen(false); try { localStorage.removeItem('user') } catch (e) {} ; navigate('/'); }}
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary w-100"
+                      onClick={() => { setIsMobileMenuOpen(false); navigate('/signin'); }}
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary w-100"
+                      onClick={() => { setIsMobileMenuOpen(false); navigate('/signup'); }}
+                    >
+                      Sign Up
+                    </button>
+                  </>
+                )}
                 <Button
                   onClick={() => {
                     onStartLearning();
