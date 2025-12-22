@@ -7,6 +7,9 @@ import Dashboard from './pages/Dashboard'
 import Navbar from './components/dashboard/Navbar'
 import VerifyEmail from './features/auth/VerifyEmail'
 
+// import the lllabs chatInterface 
+import ChatInterface from './components/lllabsChat/ChatInterface'
+
 import { UserProvider, useUser } from './contexts/userContext'
 
 function MainApp() {
@@ -15,6 +18,7 @@ function MainApp() {
 
   return (
     <>
+      {/* upper navbar - header */}
       <Navbar />
 
       <Routes>
@@ -22,6 +26,7 @@ function MainApp() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/verify" element={<VerifyEmail />} />
+        <Route path="/chat" element={<ChatInterface />} />
       </Routes>
     </>
   )
