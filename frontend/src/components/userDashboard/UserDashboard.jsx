@@ -12,7 +12,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { QuickActionsGuide } from './QuickActionsGuide';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../UI/tabs';
 
-export function UserDashboard() {
+export default function UserDashboard() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTranscriptCollapsed, setIsTranscriptCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

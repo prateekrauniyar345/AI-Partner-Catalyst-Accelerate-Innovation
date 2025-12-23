@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Plus, CheckCircle, Circle, Mic } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../UI/card';
 import { Button } from '../../UI/button';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { RotateCcw, Play, Pause, SkipForward, Volume1, Volume2, Gauge } from 'lucide-react';
 import { Button } from '../../UI/button';
 import { Slider } from '../../UI/slider';

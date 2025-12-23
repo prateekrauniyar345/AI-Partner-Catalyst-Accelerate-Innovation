@@ -9,7 +9,7 @@ import { Footer } from '../components/landingDashboard/Footer'
 import { VoiceInterface } from '../components/landingDashboard/VoiceInterface'
 // sign-in / sign-up are now dedicated pages at /signin and /signup
 
-export default function Dashboard() {
+export default function LandingDashboardPage() {
   const [voiceOpen, setVoiceOpen] = useState(false)
   // sign-in and sign-up are handled on dedicated routes now
 

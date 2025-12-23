@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { User, Sparkles, Volume1, Copy, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '../../UI/button';
 import { ScrollArea } from '../../UI/scroll-area';

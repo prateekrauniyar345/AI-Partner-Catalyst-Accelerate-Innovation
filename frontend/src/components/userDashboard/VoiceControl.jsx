@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume1 } from "lucide-react";
 
 export function VoiceControl({ onVoiceInput, isAlwaysListening = false }) {

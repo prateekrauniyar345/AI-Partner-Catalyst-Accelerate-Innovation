@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 
 import SignIn from './features/auth/SignIn'
 import SignUp from './features/auth/SignUp'
-import Dashboard from './pages/LandingDashboard'
+import LandingDashboardPage from './pages/LandingDashboardPage'
 import Navbar from './components/landingDashboard/Navbar'
 import VerifyEmail from './features/auth/VerifyEmail'
 
@@ -11,7 +11,7 @@ import VerifyEmail from './features/auth/VerifyEmail'
 import ChatInterface from './components/lllabsChat/ChatInterface'
 
 // impport the userDashboard 
-import UserDashboardPage from './pages/UserDashboard'
+import UserDashboardPage from './pages/UserDashboardPage'
 
 
 import { UserProvider, useUser } from './contexts/userContext'
@@ -26,7 +26,7 @@ function MainApp() {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<LandingDashboardPage />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/verify" element={<VerifyEmail />} />
