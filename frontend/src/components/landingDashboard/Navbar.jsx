@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Menu, X, Accessibility, MessageCircle } from 'lucide-react';
 import { useUser } from '../../contexts/userContext'
 import { Button } from '../../UI/button';
+
 
 export default function Navbar({ onStartLearning }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -17,6 +18,20 @@ export default function Navbar({ onStartLearning }) {
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Impact', href: '#impact' },
   ];
+
+  const clickHandler = useCallback((e) =>{
+    e.preventDefault();
+    // if we are in the landing page, scroll to the section
+    if(window.location.pathname === '/'){
+      document.querySelector(e.currentTarget.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // else navigate to the landing page and then scroll to the section
+      navigate('/');
+      setTimeout(() => {
+        document.querySelector(e.currentTarget.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } 
+  }, [])
 
   return (
     <motion.nav
@@ -49,10 +64,7 @@ export default function Navbar({ onStartLearning }) {
                     href={link.href}
                     className="text-decoration-none"
                     style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
-                    }}
+                    onClick={clickHandler}
                   >
                     {link.label}
                   </a>

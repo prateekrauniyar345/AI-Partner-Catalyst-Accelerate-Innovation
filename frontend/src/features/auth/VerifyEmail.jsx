@@ -1,6 +1,6 @@
 import React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Footer } from '../../components/dashboard/Footer'
+import { Footer } from '../../components/landingDashboard/Footer'
 import Button from 'react-bootstrap/Button'
 
 function useQuery() {

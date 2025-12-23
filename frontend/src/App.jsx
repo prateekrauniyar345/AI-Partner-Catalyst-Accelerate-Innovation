@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom'
 import SignIn from './features/auth/SignIn'
 import SignUp from './features/auth/SignUp'
 import Dashboard from './pages/Dashboard'
-import Navbar from './components/dashboard/Navbar'
+import Navbar from './components/landingDashboard/Navbar'
 import VerifyEmail from './features/auth/VerifyEmail'
 
 // import the lllabs chatInterface 

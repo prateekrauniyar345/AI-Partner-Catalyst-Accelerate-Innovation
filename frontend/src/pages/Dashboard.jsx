@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import Navbar from '../components/dashboard/Navbar'
-import { Hero } from '../components/dashboard/Hero'
-import { Features } from '../components/dashboard/Features'
-import { HowItWorks } from '../components/dashboard/HowItWorks'
-import { Impact } from '../components/dashboard/Impact'
-import { CTA } from '../components/dashboard/CTA'
-import { Footer } from '../components/dashboard/Footer'
-import { VoiceInterface } from '../components/dashboard/VoiceInterface'
+import Navbar from '../components/landingDashboard/Navbar'
+import { Hero } from '../components/landingDashboard/Hero'
+import { Features } from '../components/landingDashboard/Features'
+import { HowItWorks } from '../components/landingDashboard/HowItWorks'
+import { Impact } from '../components/landingDashboard/Impact'
+import { CTA } from '../components/landingDashboard/CTA'
+import { Footer } from '../components/landingDashboard/Footer'
+import { VoiceInterface } from '../components/landingDashboard/VoiceInterface'
 // sign-in / sign-up are now dedicated pages at /signin and /signup
 
 export default function Dashboard() {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
-import { Footer } from '../../components/dashboard/Footer'
+import { Footer } from '../../components/landingDashboard/Footer'
 import { signup } from '../../services/authServices'
 
 export default function SignUp() {
