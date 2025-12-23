@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Menu, X, Accessibility } from 'lucide-react';
+import { Mic, Menu, X, Accessibility, MessageCircle } from 'lucide-react';
 import { useUser } from '../../contexts/userContext'
 import { Button } from '../../UI/button';
 
 export default function Navbar({ onStartLearning }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, signOut } = useUser()
+  // console.log('Navbar user:', user);
   const navigate = useNavigate();
 
 
@@ -25,7 +26,7 @@ export default function Navbar({ onStartLearning }) {
       className="navbar navbar-expand-lg fixed-top bg-white"
       style={{ borderBottom: '1px solid #e5e7eb' }}
     >
-      <div className="container">
+      <div className="container-fluid px-4">
         <div className="d-flex align-items-center justify-content-between w-100" style={{ height: '64px' }}>
           {/* Logo - Left */}
           <div
@@ -40,32 +41,51 @@ export default function Navbar({ onStartLearning }) {
           </div>
 
           {/* Navigation Links - Center */}
-          <div className="d-none d-lg-flex align-items-center gap-4 position-absolute start-50 translate-middle-x">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-decoration-none"
-                style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                {link.label}
-              </a>
-            ))}
-            <button
-              className="btn btn-link p-0 border-0 text-decoration-none"
-              style={{ color: '#374151' }}
-              aria-label="Accessibility features"
-            >
-              <Accessibility style={{ width: '20px', height: '20px' }} />
-            </button>
+          <div className="d-flex align-items-center justify-content-between gap-4">
+              <div className="d-none d-lg-flex align-items-center gap-4 position-absolute start-50 translate-middle-x">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="text-decoration-none"
+                    style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.querySelector(link.href)?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
+                    {link.label}
+                  </a>
+                ))}
+                <button
+                  className="btn btn-link p-0 border-0 text-decoration-none"
+                  style={{ color: '#374151' }}
+                  aria-label="Accessibility features"
+                >
+                  <Accessibility style={{ width: '20px', height: '20px' }} />
+                </button>
+                {/* Chat icon placed immediately after accessibility with gradient background */}
+                {user && (
+                  <button
+                    type="button"
+                    className="btn p-0 border-0 d-flex align-items-center justify-content-center ms-3"
+                    style={{ width: 36, height: 36, background: 'linear-gradient(90deg,#7c3aed,#ec4899)', borderRadius: 8 }}
+                    onClick={(e) => { e.preventDefault(); navigate('/chat'); }}
+                    aria-label="Open chat"
+                  >
+                    <MessageCircle style={{ width: 18, height: 18, color: 'white' }} />
+                  </button>
+                )}
+              </div>
+
+              {/* placeholder for center spacing */}
+              
           </div>
 
+          {/* div for showing the chats and other pages that a logged in user can have */}
           {/* Action Buttons - Right */}
           <div className="d-none d-lg-flex align-items-center gap-2">
+            
             {user ? (
               <>
                 <div className="d-flex flex-column text-end me-2">
@@ -158,6 +178,15 @@ export default function Navbar({ onStartLearning }) {
                   {link.label}
                 </a>
               ))}
+                  {/* Mobile Chat link */}
+                  <a
+                    href="/chat"
+                    className="d-block py-2 text-decoration-none"
+                    style={{ color: '#374151' }}
+                    onClick={(e) => { e.preventDefault(); navigate('/chat'); setIsMobileMenuOpen(false); }}
+                  >
+                    Chat
+                  </a>
               <div className="mt-3 pt-3 border-top d-flex flex-column gap-2">
                 {user ? (
                   <>
