@@ -37,7 +37,9 @@ def create_app(config_class=Config):
     # register route blueprints
     from app.api.users import users_blp
     from app.api.auth import auth_blp
+    from app.api.default import default_blp
     api.register_blueprint(users_blp)
     api.register_blueprint(auth_blp)
+    api.register_blueprint(default_blp)
 
     return app
