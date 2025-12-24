@@ -66,19 +66,19 @@ export function ProjectPlanner() {
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-danger bg-opacity-10 text-danger border-danger';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+        return 'bg-warning bg-opacity-10 text-warning border-warning';
       case 'low':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-success bg-opacity-10 text-success border-success';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-secondary bg-opacity-10 text-secondary border-secondary';
     }
   };
 
   const announceAction = (message) => {
     const announcement = document.createElement('div');
-    announcement.className = 'sr-only';
+    announcement.className = 'visually-hidden';
     announcement.setAttribute('role', 'status');
     announcement.setAttribute('aria-live', 'polite');
     announcement.textContent = message;
@@ -87,26 +87,26 @@ export function ProjectPlanner() {
   };
 
   return (
-    <Card className="border-2">
+    <Card className="border">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-purple-600" />
+        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <CardTitle className="d-flex align-items-center gap-2 mb-0">
+            <Target className="text-primary" />
             Active Projects
           </CardTitle>
           <Button
             size="sm"
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+            className="btn btn-primary text-white"
             onClick={() => announceAction('Opening project creation dialog')}
           >
-            <Plus className="w-4 h-4 mr-1" />
+            <Plus style={{width: 16, height: 16}} className="me-1" />
             New Project
           </Button>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        <div className="space-y-4" role="list" aria-label="Active projects">
+      <CardContent>
+        <div className="d-flex flex-column gap-3" role="list" aria-label="Active projects">
           <AnimatePresence>
             {projects.map((project, index) => (
               <motion.div
@@ -119,10 +119,10 @@ export function ProjectPlanner() {
               >
                 <div
                   className={`
-                    p-4 rounded-lg border-2 transition-all
+                    p-4 rounded border border-2 transition-all
                     ${expandedProject === project.id 
-                      ? 'border-purple-300 bg-purple-50' 
-                      : 'border-gray-200 hover:border-purple-200 bg-white'}
+                      ? 'border-primary bg-light' 
+                      : 'border-secondary'}
                   `}
                 >
                   {/* Project header */}
@@ -131,6 +131,7 @@ export function ProjectPlanner() {
                     onClick={() => setExpandedProject(expandedProject === project.id ? null : project.id)}
                     role="button"
                     tabIndex={0}
+                    style={{ cursor: 'pointer' }}
                     aria-expanded={expandedProject === project.id}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
@@ -138,21 +139,21 @@ export function ProjectPlanner() {
                       }
                     }}
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h5 className="font-semibold text-gray-900 mb-1">{project.title}</h5>
-                        <p className="text-sm text-gray-600 mb-2">{project.description}</p>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant="outline" className={getPriorityColor(project.priority)}>
+                    <div className="d-flex align-items-start justify-content-between gap-3 mb-3 flex-wrap">
+                      <div className="flex-grow-1">
+                        <h5 className="fw-semibold text-dark mb-1">{project.title}</h5>
+                        <p className="small text-muted mb-2">{project.description}</p>
+                        <div className="d-flex flex-wrap align-items-center gap-2">
+                          <Badge className={`border ${getPriorityColor(project.priority)}`}>
                             {project.priority} priority
                           </Badge>
-                          <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-200">
+                          <Badge className="bg-info bg-opacity-10 text-info border-info">
                             {project.subject}
                           </Badge>
-                          <span className="text-xs text-gray-500">Due: {project.dueDate}</span>
+                          <span className="small text-muted">Due: {project.dueDate}</span>
                         </div>
                       </div>
-                      <div className="text-2xl font-bold text-purple-600 ml-4">
+                      <div className="fw-bold text-primary" style={{fontSize: '1.5rem'}}>
                         {project.progress}%
                       </div>
                     </div>
@@ -160,7 +161,7 @@ export function ProjectPlanner() {
                     {/* Progress bar */}
                     <div className="mb-3">
                       <Progress value={project.progress} className="h-2" />
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <div className="d-flex justify-content-between align-items-center small text-muted mt-1 flex-wrap">
                         <span>
                           {project.tasks.filter(t => t.completed).length} of {project.tasks.length} tasks completed
                         </span>
@@ -178,35 +179,37 @@ export function ProjectPlanner() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="pt-4 border-t border-purple-200"
+                        className="pt-4 border-top"
                       >
-                        <h6 className="text-sm font-semibold text-gray-700 mb-3">Tasks</h6>
-                        <div className="space-y-2" role="list" aria-label={`Tasks for ${project.title}`}>
+                        <h6 className="small fw-semibold text-dark mb-3">Tasks</h6>
+                        <div className="d-flex flex-column gap-2" role="list" aria-label={`Tasks for ${project.title}`}>
                           {project.tasks.map((task) => (
                             <motion.div
                               key={task.id}
                               whileHover={{ x: 4 }}
-                              className="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition-colors"
+                              className="d-flex align-items-center gap-3 p-2 rounded transition-all"
                               role="listitem"
+                              style={{backgroundColor: 'transparent'}}
                             >
                               <button
                                 onClick={() => toggleTask(project.id, task.id)}
                                 className={`
-                                  w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                                  transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2
+                                  rounded-circle border-2 d-flex align-items-center justify-content-center flex-shrink-0
+                                  transition-all
                                   ${task.completed 
-                                    ? 'bg-green-500 border-green-500' 
-                                    : 'border-gray-300 hover:border-purple-400'}
+                                    ? 'bg-success border-success' 
+                                    : 'border-secondary'}
                                 `}
+                                style={{width: 24, height: 24}}
                                 aria-label={task.completed ? 'Mark task as incomplete' : 'Mark task as complete'}
                                 aria-checked={task.completed}
                                 role="checkbox"
                               >
-                                {task.completed && <CheckCircle className="w-4 h-4 text-white" />}
+                                {task.completed && <CheckCircle className="text-white" style={{width: 16, height: 16}} />}
                               </button>
                               <span
-                                className={`flex-1 text-sm ${
-                                  task.completed ? 'line-through text-gray-400' : 'text-gray-700'
+                                className={`flex-grow-1 small ${
+                                  task.completed ? 'text-muted text-decoration-line-through' : 'text-dark'
                                 }`}
                               >
                                 {task.title}
@@ -216,10 +219,10 @@ export function ProjectPlanner() {
                         </div>
 
                         {/* Project actions */}
-                        <div className="flex gap-2 mt-4">
+                        <div className="d-flex gap-2 mt-4 flex-wrap">
                           <Button
                             size="sm"
-                            variant="outline"
+                            className="btn btn-outline-secondary"
                             onClick={(e) => {
                               e.stopPropagation();
                               announceAction('Viewing project details');
@@ -229,7 +232,7 @@ export function ProjectPlanner() {
                           </Button>
                           <Button
                             size="sm"
-                            variant="outline"
+                            className="btn btn-outline-secondary"
                             onClick={(e) => {
                               e.stopPropagation();
                               announceAction('Editing project');
@@ -249,20 +252,20 @@ export function ProjectPlanner() {
 
         {/* Empty state */}
         {projects.length === 0 && (
-          <div className="text-center py-12">
-            <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-2">No active projects</p>
-            <p className="text-sm text-gray-400">Say "Create a project" to get started</p>
+          <div className="text-center py-5">
+            <Target style={{width: 64, height: 64}} className="text-secondary mx-auto mb-4" />
+            <p className="text-muted mb-2">No active projects</p>
+            <p className="small text-secondary">Say "Create a project" to get started</p>
           </div>
         )}
 
         {/* Voice command help */}
-        <div className="pt-4 border-t border-gray-100">
+        <div className="pt-4 border-top mt-4">
           <button
-            className="w-full flex items-center justify-center gap-2 text-sm text-purple-600 hover:text-purple-700 transition-colors py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 rounded"
+            className="btn btn-link btn-sm w-100 d-flex align-items-center justify-content-center gap-2 text-primary text-decoration-none py-2"
             aria-label="Use voice commands to manage projects"
           >
-            <Mic className="w-4 h-4" />
+            <Mic style={{width: 16, height: 16}} />
             <span>Say "Create project" or "Show my projects"</span>
           </button>
         </div>

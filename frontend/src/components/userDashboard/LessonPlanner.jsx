@@ -43,26 +43,26 @@ export function LessonPlanner() {
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case 'easy':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-success bg-opacity-10 text-success border-success';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+        return 'bg-warning bg-opacity-10 text-warning border-warning';
       case 'hard':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-danger bg-opacity-10 text-danger border-danger';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-secondary bg-opacity-10 text-secondary border-secondary';
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'scheduled':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
+        return 'bg-info bg-opacity-10 text-info border-info';
       case 'in-progress':
-        return 'bg-purple-100 text-purple-700 border-purple-200';
+        return 'bg-primary bg-opacity-10 text-primary border-primary';
       case 'completed':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-success bg-opacity-10 text-success border-success';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-secondary bg-opacity-10 text-secondary border-secondary';
     }
   };
 
@@ -77,7 +77,7 @@ export function LessonPlanner() {
 
   const announceAction = (message) => {
     const announcement = document.createElement('div');
-    announcement.className = 'sr-only';
+    announcement.className = 'visually-hidden';
     announcement.setAttribute('role', 'status');
     announcement.setAttribute('aria-live', 'polite');
     announcement.textContent = message;
@@ -88,7 +88,7 @@ export function LessonPlanner() {
   return (
     <Card className="border">
       <CardHeader>
-        <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
           <CardTitle className="d-flex align-items-center gap-2 mb-0">
             <Calendar className="text-primary" />
             Lesson Plan
@@ -127,11 +127,10 @@ export function LessonPlanner() {
                 className="mb-3"
               >
                 <div
-                  className={`p-3 rounded border transition-all cursor-pointer ${
-                    expandedLesson === lesson.id
+                  className={`p-3 rounded border transition-all border-2 ${expandedLesson === lesson.id
                       ? 'border-primary bg-light'
                       : 'border-secondary bg-white'
-                  }`}
+                    }`}
                   onClick={() => setExpandedLesson(expandedLesson === lesson.id ? null : lesson.id)}
                   role="button"
                   tabIndex={0}
@@ -142,10 +141,11 @@ export function LessonPlanner() {
                       setExpandedLesson(expandedLesson === lesson.id ? null : lesson.id);
                     }
                   }}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <div className="d-flex align-items-start justify-content-between gap-3">
-                    <div className="flex-grow-1">
-                      <div className="d-flex align-items-center gap-2 mb-2">
+                  <div className="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+                    <div className="flex-grow-1\">
+                      <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
                         {lesson.status === 'completed' ? (
                           <div className="d-flex align-items-center justify-content-center rounded-circle" style={{width: 24, height: 24, background: '#198754', flexShrink: 0}}>
                             <Check className="text-white" style={{width: 16, height: 16}} />
@@ -166,7 +166,7 @@ export function LessonPlanner() {
                         <span className="small text-muted">{lesson.subject}</span>
                       </div>
 
-                      <div className="d-flex align-items-center gap-3 mt-2 ms-4 small text-muted">
+                      <div className="d-flex align-items-center gap-3 mt-2 ms-4 small text-muted flex-wrap">
                         <span className="d-flex align-items-center gap-1">
                           <Clock style={{width: 12, height: 12}} />
                           {lesson.duration}
@@ -200,7 +200,7 @@ export function LessonPlanner() {
                           and adaptive pacing based on your understanding.
                         </p>
 
-                        <div className="d-flex gap-2">
+                        <div className="d-flex gap-2 flex-wrap">
                           {lesson.status === 'scheduled' && (
                             <Button
                               size="sm"

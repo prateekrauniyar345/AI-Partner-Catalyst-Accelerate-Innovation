@@ -22,8 +22,8 @@ function MainApp() {
 
   return (
     <>
-      {/* upper navbar - header */}
-      <Navbar />
+      {/* upper navbar - header (hidden when user is signed in) */}
+      { !user && <Navbar /> }
 
       <Routes>
         <Route path="/" element={<LandingDashboardPage />} />

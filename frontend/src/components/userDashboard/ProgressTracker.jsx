@@ -11,7 +11,7 @@ const mockProgress = [
     totalLessons: 20,
     timeSpent: '4h 30m',
     lastAccessed: '2 hours ago',
-    color: 'bg-blue-500',
+    color: 'bg-primary',
   },
   {
     subject: 'Science',
@@ -20,7 +20,7 @@ const mockProgress = [
     totalLessons: 20,
     timeSpent: '3h 15m',
     lastAccessed: '1 day ago',
-    color: 'bg-green-500',
+    color: 'bg-success',
   },
   {
     subject: 'History',
@@ -29,7 +29,7 @@ const mockProgress = [
     totalLessons: 20,
     timeSpent: '6h 45m',
     lastAccessed: '3 hours ago',
-    color: 'bg-purple-500',
+    color: 'bg-info',
   },
 ];
 
@@ -44,7 +44,7 @@ export function ProgressTracker() {
   return (
     <div className="d-flex flex-column gap-4">
       {/* Overview Stats */}
-      <div className="row g-3">
+      <div className="row g-2 g-md-3">
         <div className="col-6 col-lg-3">
           <Card className="border h-100">
             <CardContent className="pt-3">
@@ -137,7 +137,7 @@ export function ProgressTracker() {
                 </div>
               </div>
 
-              <div className="row g-2 mt-2 text-sm">
+              <div className="row g-2 mt-2 text-sm flex-wrap\">
                 <div className="col-4 d-flex align-items-center gap-2 text-muted">
                   <CheckCircle className="text-success" style={{width: 16, height: 16}} />
                   <span className="small">{subject.lessons}/{subject.totalLessons} lessons</span>

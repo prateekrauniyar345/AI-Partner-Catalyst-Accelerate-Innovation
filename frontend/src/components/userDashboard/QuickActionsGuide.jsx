@@ -6,8 +6,8 @@ const voiceCommands = [
   {
     category: 'Learning',
     icon: BookOpen,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-100',
+    color: 'text-primary',
+    bgColor: 'bg-primary',
     commands: [
       { phrase: '"Start a lesson"', action: 'Begin your next scheduled lesson' },
       { phrase: '"Teach me about [topic]"', action: 'Start learning about any subject' },
@@ -19,8 +19,8 @@ const voiceCommands = [
   {
     category: 'Progress',
     icon: BarChart3,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100',
+    color: 'text-info',
+    bgColor: 'bg-info',
     commands: [
       { phrase: '"Show my progress"', action: 'View learning statistics' },
       { phrase: '"What did I learn today?"', action: 'Daily summary' },
@@ -31,8 +31,8 @@ const voiceCommands = [
   {
     category: 'Planning',
     icon: Target,
-    color: 'text-green-600',
-    bgColor: 'bg-green-100',
+    color: 'text-success',
+    bgColor: 'bg-success',
     commands: [
       { phrase: '"Plan a lesson"', action: 'Schedule new learning session' },
       { phrase: '"Create project"', action: 'Start a new project' },
@@ -43,8 +43,8 @@ const voiceCommands = [
   {
     category: 'Settings',
     icon: Settings,
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-100',
+    color: 'text-warning',
+    bgColor: 'bg-warning',
     commands: [
       { phrase: '"Change voice"', action: 'Select different AI voice' },
       { phrase: '"Speak slower" / "faster"', action: 'Adjust voice speed' },
@@ -70,8 +70,8 @@ export function QuickActionsGuide() {
           return (
             <motion.div key={category.category} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: categoryIndex * 0.1 }} className="mb-3">
               <div className="d-flex align-items-center gap-2 mb-2">
-                <div className="d-inline-flex align-items-center justify-content-center rounded" style={{width:32,height:32, background: category.bgColor==='bg-purple-100'?'#f3e8ff': category.bgColor==='bg-blue-100'?'#e6f0ff': category.bgColor==='bg-green-100'?'#ecfdf5':'#fff4e6'}}>
-                  <Icon className={category.color==='text-purple-600'?'text-primary':''} />
+                <div className="d-inline-flex align-items-center justify-content-center rounded" style={{width:32,height:32, background: category.bgColor==='bg-primary'?'#f3e8ff': category.bgColor==='bg-info'?'#e6f0ff': category.bgColor==='bg-success'?'#ecfdf5':'#fff4e6'}}>
+                  <Icon className={category.color==='text-primary'?'text-primary': category.color==='text-info'?'text-info': category.color==='text-success'?'text-success':'text-warning'} />
                 </div>
                 <h4 className="mb-0">{category.category}</h4>
               </div>

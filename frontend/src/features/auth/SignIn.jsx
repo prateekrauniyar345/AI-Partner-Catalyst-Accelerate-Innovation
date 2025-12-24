@@ -48,7 +48,7 @@ export default function SignIn() {
       // Persist user in context (tokens stored as HttpOnly cookies)
       const user = data?.user || data
       if (user) login(user)
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) {
       // err may be a thrown response body from authServices
       const msg = (err && (err.message || err.error || err.detail)) || 'Sign in failed — try again.'

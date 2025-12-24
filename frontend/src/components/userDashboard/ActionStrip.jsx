@@ -25,7 +25,7 @@ export function ActionStrip({ onAction }) {
     };
     
     const announcement = document.createElement('div');
-    announcement.className = 'sr-only';
+    announcement.className = 'visually-hidden';
     announcement.setAttribute('role', 'status');
     announcement.setAttribute('aria-live', 'polite');
     announcement.textContent = messages[action] || action;
