@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, User, Bell, HelpCircle, LogOut, Menu, X } from 'lucide-react';
-import { Button, Nav, Tab, Tabs } from 'react-bootstrap';
+import { Button, Nav } from 'react-bootstrap';
 import { VoiceControl } from './VoiceControl';
 import { TranscriptFeed } from './TranscriptFeed';
 import { ActionStrip } from './ActionStrip';
@@ -28,7 +28,7 @@ export default function UserDashboard() {
   };
 
   return (
-    <div className="min-vh-100" style={{ background: 'linear-gradient(90deg, #f3e8ff, #ffe4f6)' }}>
+    <div className="min-vh-100" style={{ backgroundColor: '#f7fafc' }}>
       {/* Top Status Bar - Fixed */}
       <header className="position-fixed top-0 start-0 end-0 bg-white border-bottom shadow-sm" style={{ zIndex: 1040 }}>
         <div className="container-fluid px-3 px-md-4">
@@ -51,11 +51,11 @@ export default function UserDashboard() {
                   style={{
                     width: 48,
                     height: 48,
-                    background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
-                    boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
+                    background: '#e9ecef',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
                   }}
                 >
-                  <User className="text-white" size={24} />
+                  <User className="text-dark" size={24} />
                 </div>
                 <div className="d-none d-sm-block">
                   <h2 className="h6 mb-1 fw-semibold">Welcome back, {displayName || 'there'}!</h2>
@@ -99,16 +99,64 @@ export default function UserDashboard() {
             >
               <Nav variant="pills" activeKey={activeTab} onSelect={handleTabSelect} className="flex-column p-3">
                 <Nav.Item>
-                  <Nav.Link eventKey="learn">Voice Learning</Nav.Link>
+                  <Nav.Link
+                    eventKey="learn"
+                    style={{
+                      backgroundColor: activeTab === 'learn' ? '#f3f4f6' : 'transparent',
+                      color: '#000',
+                      fontWeight: activeTab === 'learn' ? 700 : 500,
+                      borderRadius: 8,
+                      padding: '8px 12px',
+                      marginBottom: 8,
+                    }}
+                  >
+                    Voice Learning
+                  </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link eventKey="progress">My Progress</Nav.Link>
+                  <Nav.Link
+                    eventKey="progress"
+                    style={{
+                      backgroundColor: activeTab === 'progress' ? '#f3f4f6' : 'transparent',
+                      color: '#000',
+                      fontWeight: activeTab === 'progress' ? 700 : 500,
+                      borderRadius: 8,
+                      padding: '8px 12px',
+                      marginBottom: 8,
+                    }}
+                  >
+                    My Progress
+                  </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link eventKey="lessons">Lesson Plans</Nav.Link>
+                  <Nav.Link
+                    eventKey="lessons"
+                    style={{
+                      backgroundColor: activeTab === 'lessons' ? '#f3f4f6' : 'transparent',
+                      color: '#000',
+                      fontWeight: activeTab === 'lessons' ? 700 : 500,
+                      borderRadius: 8,
+                      padding: '8px 12px',
+                      marginBottom: 8,
+                    }}
+                  >
+                    Lesson Plans
+                  </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link eventKey="projects">Projects</Nav.Link>
+                  <Nav.Link
+                    eventKey="projects"
+                    style={{
+                      backgroundColor: activeTab === 'projects' ? '#f3f4f6' : 'transparent',
+                      color: '#000',
+                      fontWeight: activeTab === 'projects' ? 700 : 500,
+                      borderRadius: 8,
+                      padding: '8px 12px',
+                      marginBottom: 8,
+                    }}
+                  >
+                    Projects
+                  </Nav.Link>
                 </Nav.Item>
               </Nav>
             </motion.div>
@@ -119,67 +167,108 @@ export default function UserDashboard() {
       {/* Main Content - with top padding for fixed header */}
       <main className="pt-5 px-3 pb-4" style={{ paddingTop: '100px' }}>
         <div className="container">
-          <Tabs activeKey={activeTab} onSelect={handleTabSelect} id="user-dashboard-tabs" className="d-none d-lg-block mt-3">
-            <Tab eventKey="learn" title="🎤 Voice Learning">
-              <div className="row g-3">
-                <div className="col-lg-8">
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-3 shadow-sm p-4 border">
-                    <VoiceControl />
-                  </motion.div>
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-3">
-                    <ActionStrip />
-                  </motion.div>
+          {/* Desktop nav + content (minimal, rounded, neutral) */}
+          <div className="d-none d-lg-block mt-3">
+            <div style={{ display: 'flex', gap: 8, backgroundColor: '#ffffff', padding: 6, borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
+              <button
+                onClick={() => handleTabSelect('learn')}
+                style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: activeTab === 'learn' ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === 'learn' ? 700 : 500 }}
+                className="btn"
+              >
+                🎤 Voice Learning
+              </button>
+
+              <button
+                onClick={() => handleTabSelect('lessons')}
+                style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: activeTab === 'lessons' ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === 'lessons' ? 700 : 500 }}
+                className="btn"
+              >
+                📚 Lesson Plans
+              </button>
+
+              <button
+                onClick={() => handleTabSelect('progress')}
+                style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: activeTab === 'progress' ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === 'progress' ? 700 : 500 }}
+                className="btn"
+              >
+                📊 My Progress
+              </button>
+
+              <div style={{ flex: 1 }} />
+              <button
+                onClick={() => handleTabSelect('projects')}
+                style={{ padding: '6px 10px', borderRadius: 10, border: 'none', backgroundColor: activeTab === 'projects' ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === 'projects' ? 700 : 500, opacity: 0.85 }}
+                className="btn"
+              >
+                🎯 Projects
+              </button>
+            </div>
+
+            <div className="mt-3">
+              {activeTab === 'learn' && (
+                <div className="row g-3">
+                  <div className="col-lg-8">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-3 shadow-sm p-4 border">
+                      <VoiceControl />
+                    </motion.div>
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-3">
+                      <ActionStrip />
+                    </motion.div>
+                  </div>
+                  <div className="col-lg-4">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} style={{ height: 600 }}>
+                      <TranscriptFeed isCollapsed={isTranscriptCollapsed} onToggleCollapse={() => setIsTranscriptCollapsed(!isTranscriptCollapsed)} />
+                    </motion.div>
+                  </div>
                 </div>
-                <div className="col-lg-4">
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} style={{ height: 600 }}>
-                    <TranscriptFeed isCollapsed={isTranscriptCollapsed} onToggleCollapse={() => setIsTranscriptCollapsed(!isTranscriptCollapsed)} />
-                  </motion.div>
+              )}
+
+              {activeTab === 'progress' && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                  <ProgressTracker />
+                </motion.div>
+              )}
+
+              {activeTab === 'lessons' && (
+                <div className="row g-3">
+                  <div className="col-lg-6">
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                      <LessonPlanner />
+                    </motion.div>
+                  </div>
+                  <div className="col-lg-6">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded border p-3">
+                      <h3 className="fw-semibold mb-3">Quick Actions</h3>
+                      <QuickActionsGuide />
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
-            </Tab>
-            <Tab eventKey="progress" title="📊 My Progress">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <ProgressTracker />
-              </motion.div>
-            </Tab>
-            <Tab eventKey="lessons" title="📚 Lesson Plans">
-              <div className="row g-3">
-                <div className="col-lg-6">
-                  <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                    <LessonPlanner />
-                  </motion.div>
+              )}
+
+              {activeTab === 'projects' && (
+                <div className="row g-3">
+                  <div className="col-lg-8">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                      <ProjectPlanner />
+                    </motion.div>
+                  </div>
+                  <div className="col-lg-4">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="d-flex flex-column gap-3">
+                      <div className="rounded-3 p-3" style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', color: '#000' }}>
+                        <h3 className="fw-semibold mb-2">💡 Voice Tip</h3>
+                        <p className="small">Say "Mark task complete" followed by the task name to check it off your list hands-free!</p>
+                      </div>
+                      <div className="bg-white rounded border p-3 text-center">
+                        <div className="display-4 mb-2">🏆</div>
+                        <h3 className="fw-semibold mb-2">Keep Going!</h3>
+                        <p className="small text-muted">You're making great progress on your projects. Stay focused and you'll achieve your goals!</p>
+                      </div>
+                    </motion.div>
+                  </div>
                 </div>
-                <div className="col-lg-6">
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded border p-3">
-                    <h3 className="fw-semibold mb-3">Quick Actions</h3>
-                    <QuickActionsGuide />
-                  </motion.div>
-                </div>
-              </div>
-            </Tab>
-            <Tab eventKey="projects" title="🎯 Projects">
-              <div className="row g-3">
-                <div className="col-lg-8">
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                    <ProjectPlanner />
-                  </motion.div>
-                </div>
-                <div className="col-lg-4">
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="d-flex flex-column gap-3">
-                    <div className="rounded-3 p-3 text-white" style={{ background: 'linear-gradient(90deg, #7c3aed, #ec4899)' }}>
-                      <h3 className="fw-semibold mb-2">💡 Voice Tip</h3>
-                      <p className="small">Say "Mark task complete" followed by the task name to check it off your list hands-free!</p>
-                    </div>
-                    <div className="bg-white rounded border p-3 text-center">
-                      <div className="display-4 mb-2">🏆</div>
-                      <h3 className="fw-semibold mb-2">Keep Going!</h3>
-                      <p className="small text-muted">You're making great progress on your projects. Stay focused and you'll achieve your goals!</p>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-            </Tab>
-          </Tabs>
+              )}
+            </div>
+          </div>
 
           {/* Content for mobile view (driven by the same state) */}
           <div className="d-lg-none mt-3">
@@ -229,7 +318,7 @@ export default function UserDashboard() {
               </div>
               <div className="col-lg-4">
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="d-flex flex-column gap-3">
-                  <div className="rounded-3 p-3 text-white" style={{ background: 'linear-gradient(90deg, #7c3aed, #ec4899)' }}>
+                  <div className="rounded-3 p-3" style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0,0,0,0.06)', color: '#000' }}>
                     <h3 className="fw-semibold mb-2">💡 Voice Tip</h3>
                     <p className="small">Say "Mark task complete" followed by the task name to check it off your list hands-free!</p>
                   </div>
