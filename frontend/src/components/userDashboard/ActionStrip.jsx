@@ -1,27 +1,26 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { RotateCcw, Play, Pause, SkipForward, Volume1, Volume2, Gauge } from 'lucide-react';
-import { Button } from '../../UI/button';
-import { Slider } from '../../UI/slider';
+import { Button, Form } from 'react-bootstrap';
 
 export function ActionStrip({ onAction }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState([1.0]);
-  const [volume, setVolume] = useState([80]);
+  const [speed, setSpeed] = useState(1.0);
+  const [volume, setVolume] = useState(80);
 
-  const handleAction = (action) => {
-    onAction?.(action);
-    announceAction(action);
+  const handleAction = (action, value) => {
+    onAction?.(action, value);
+    announceAction(action, value);
   };
 
-  const announceAction = (action) => {
+  const announceAction = (action, value) => {
     const messages = {
       rewind: 'Rewinding 10 seconds',
       play: 'Playback started',
       pause: 'Playback paused',
       skip: 'Skipped forward',
-      speed: `Playback speed set to ${speed[0]}x`,
-      volume: `Volume set to ${volume[0]}%`,
+      speed: `Playback speed set to ${value}x`,
+      volume: `Volume set to ${value}%`,
     };
     
     const announcement = document.createElement('div');
@@ -39,42 +38,41 @@ export function ActionStrip({ onAction }) {
         {/* Main controls */}
         <div className="d-flex align-items-center justify-content-center gap-2">
           <Button
-            variant="outline"
-            size="lg"
+            variant="outline-secondary"
             onClick={() => handleAction('rewind')}
-            className="btn btn-outline-secondary rounded-circle"
+            className="rounded-circle p-3"
             aria-label="Rewind 10 seconds"
             title="Rewind (R)"
           >
-            <RotateCcw className="" />
+            <RotateCcw size={20} />
           </Button>
 
           <Button
-            size="lg"
+            variant="primary"
             onClick={() => {
-              setIsPlaying(!isPlaying);
-              handleAction(isPlaying ? 'pause' : 'play');
+              const newIsPlaying = !isPlaying;
+              setIsPlaying(newIsPlaying);
+              handleAction(newIsPlaying ? 'play' : 'pause');
             }}
-            className="btn btn-primary rounded-circle text-white"
+            className="rounded-circle p-3"
             aria-label={isPlaying ? 'Pause playback' : 'Play or resume'}
             title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
           >
             {isPlaying ? (
-              <Pause className="" />
+              <Pause size={24} className="text-white" />
             ) : (
-              <Play className="" />
+              <Play size={24} className="text-white" />
             )}
           </Button>
 
           <Button
-            variant="outline"
-            size="lg"
+            variant="outline-secondary"
             onClick={() => handleAction('skip')}
-            className="btn btn-outline-secondary rounded-circle"
+            className="rounded-circle p-3"
             aria-label="Skip forward"
             title="Skip (S)"
           >
-            <SkipForward className="" />
+            <SkipForward size={20} />
           </Button>
         </div>
 
@@ -83,25 +81,25 @@ export function ActionStrip({ onAction }) {
           {/* Speed control */}
           <div className="col-12 col-md-6">
             <div className="mb-2 d-flex align-items-center justify-content-between">
-              <label htmlFor="speed-slider" className="d-flex align-items-center gap-2 small fw-medium text-secondary">
-                <Gauge className="" />
+              <label htmlFor="speed-slider" className="d-flex align-items-center gap-2 small fw-normal text-secondary">
+                <Gauge size={16} />
                 <span>Speed</span>
               </label>
               <span className="small fw-semibold text-primary" aria-live="polite">
-                {speed[0].toFixed(1)}x
+                {speed.toFixed(1)}x
               </span>
             </div>
-            <Slider
+            <Form.Range
               id="speed-slider"
               value={speed}
-              onValueChange={(value) => {
-                setSpeed(value);
-                handleAction('speed');
+              onChange={(e) => {
+                const newSpeed = parseFloat(e.target.value);
+                setSpeed(newSpeed);
+                handleAction('speed', newSpeed);
               }}
               min={0.5}
               max={2.0}
               step={0.1}
-              className="w-100"
               aria-label="Playback speed"
             />
             <div className="d-flex justify-content-between small text-muted">
@@ -114,29 +112,29 @@ export function ActionStrip({ onAction }) {
           {/* Volume control */}
           <div className="col-12 col-md-6">
             <div className="mb-2 d-flex align-items-center justify-content-between">
-              <label htmlFor="volume-slider" className="d-flex align-items-center gap-2 small fw-medium text-secondary">
-                {volume[0] > 50 ? (
-                  <Volume2 className="" />
+              <label htmlFor="volume-slider" className="d-flex align-items-center gap-2 small fw-normal text-secondary">
+                {volume > 50 ? (
+                  <Volume2 size={16} />
                 ) : (
-                  <Volume1 className="" />
+                  <Volume1 size={16} />
                 )}
                 <span>Volume</span>
               </label>
               <span className="small fw-semibold text-primary" aria-live="polite">
-                {volume[0]}%
+                {volume}%
               </span>
             </div>
-            <Slider
+            <Form.Range
               id="volume-slider"
               value={volume}
-              onValueChange={(value) => {
-                setVolume(value);
-                handleAction('volume');
+              onChange={(e) => {
+                const newVolume = parseInt(e.target.value, 10);
+                setVolume(newVolume);
+                handleAction('volume', newVolume);
               }}
               min={0}
               max={100}
               step={5}
-              className="w-100"
               aria-label="Volume level"
             />
             <div className="d-flex justify-content-between small text-muted">
@@ -152,24 +150,19 @@ export function ActionStrip({ onAction }) {
           <details>
             <summary className="small text-muted d-flex align-items-center justify-content-center gap-1 p-1" style={{cursor:'pointer'}}>
               <span>Keyboard shortcuts</span>
-              <motion.span animate={{ rotate: 0 }}>▼</motion.span>
             </summary>
             <div className="mt-2 small text-secondary bg-light rounded p-3">
-              <div className="d-flex justify-content-between">
+              <div className="d-flex justify-content-between mb-1">
                 <span>Play/Pause:</span>
                 <kbd className="px-2 py-1 bg-white border rounded">Space</kbd>
               </div>
-              <div className="d-flex justify-content-between">
+              <div className="d-flex justify-content-between mb-1">
                 <span>Rewind:</span>
                 <kbd className="px-2 py-1 bg-white border rounded">R</kbd>
               </div>
               <div className="d-flex justify-content-between">
                 <span>Skip:</span>
                 <kbd className="px-2 py-1 bg-white border rounded">S</kbd>
-              </div>
-              <div className="d-flex justify-content-between">
-                <span>Speed up/down:</span>
-                <kbd className="px-2 py-1 bg-white border rounded">+ / -</kbd>
               </div>
             </div>
           </details>

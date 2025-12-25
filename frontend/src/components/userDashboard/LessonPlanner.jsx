@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, BookOpen, Plus, Check, ChevronRight, Mic } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../UI/card';
-import { Button } from '../../UI/button';
-import { Badge } from '../../UI/badge';
-
+import { Card, Button, Badge } from 'react-bootstrap';
 
 const mockLessons = [
   {
@@ -32,7 +29,7 @@ const mockLessons = [
     duration: '30 min',
     scheduledFor: 'Tomorrow, 10:00 AM',
     status: 'scheduled',
-    difficulty: 'medium',
+    difficulty: 'hard',
   },
 ];
 
@@ -40,35 +37,35 @@ export function LessonPlanner() {
   const [lessons, setLessons] = useState(mockLessons);
   const [expandedLesson, setExpandedLesson] = useState(null);
 
-  const getDifficultyColor = (difficulty) => {
+  const getDifficultyVariant = (difficulty) => {
     switch (difficulty) {
       case 'easy':
-        return 'bg-success bg-opacity-10 text-success border-success';
+        return 'success';
       case 'medium':
-        return 'bg-warning bg-opacity-10 text-warning border-warning';
+        return 'warning';
       case 'hard':
-        return 'bg-danger bg-opacity-10 text-danger border-danger';
+        return 'danger';
       default:
-        return 'bg-secondary bg-opacity-10 text-secondary border-secondary';
+        return 'secondary';
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusVariant = (status) => {
     switch (status) {
       case 'scheduled':
-        return 'bg-info bg-opacity-10 text-info border-info';
+        return 'info';
       case 'in-progress':
-        return 'bg-primary bg-opacity-10 text-primary border-primary';
+        return 'primary';
       case 'completed':
-        return 'bg-success bg-opacity-10 text-success border-success';
+        return 'success';
       default:
-        return 'bg-secondary bg-opacity-10 text-secondary border-secondary';
+        return 'secondary';
     }
   };
 
   const handleStartLesson = (lessonId) => {
-    setLessons(lessons.map(lesson => 
-      lesson.id === lessonId 
+    setLessons(lessons.map(lesson =>
+      lesson.id === lessonId
         ? { ...lesson, status: 'in-progress' }
         : lesson
     ));
@@ -86,34 +83,30 @@ export function LessonPlanner() {
   };
 
   return (
-    <Card className="border">
-      <CardHeader>
+    <Card>
+      <Card.Header>
         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-          <CardTitle className="d-flex align-items-center gap-2 mb-0">
+          <Card.Title as="h5" className="d-flex align-items-center gap-2 mb-0">
             <Calendar className="text-primary" />
             Lesson Plan
-          </CardTitle>
+          </Card.Title>
           <Button
             size="sm"
-            className="btn btn-primary"
+            variant="primary"
             onClick={() => announceAction('Opening lesson creation dialog')}
           >
-            <Plus style={{width: 16, height: 16}} className="me-1" />
+            <Plus size={16} className="me-1" />
             Add Lesson
           </Button>
         </div>
-      </CardHeader>
+      </Card.Header>
 
-      <CardContent>
-        {/* Today's schedule */}
-        <div className="mb-3">
-          <h4 className="small fw-semibold text-muted d-flex align-items-center gap-2 mb-3">
-            <Clock style={{width: 16, height: 16}} className="text-primary" />
-            Today's Schedule
-          </h4>
-        </div>
+      <Card.Body>
+        <h6 className="small fw-semibold text-muted d-flex align-items-center gap-2 mb-3">
+          <Clock size={16} className="text-primary" />
+          Today's Schedule
+        </h6>
 
-        {/* Lessons list */}
         <div role="list" aria-label="Scheduled lessons">
           <AnimatePresence>
             {lessons.map((lesson, index) => (
@@ -127,7 +120,7 @@ export function LessonPlanner() {
                 className="mb-3"
               >
                 <div
-                  className={`p-3 rounded border transition-all border-2 ${expandedLesson === lesson.id
+                  className={`p-3 rounded border ${expandedLesson === lesson.id
                       ? 'border-primary bg-light'
                       : 'border-secondary bg-white'
                     }`}
@@ -144,23 +137,23 @@ export function LessonPlanner() {
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-                    <div className="flex-grow-1\">
+                    <div className="flex-grow-1">
                       <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
                         {lesson.status === 'completed' ? (
-                          <div className="d-flex align-items-center justify-content-center rounded-circle" style={{width: 24, height: 24, background: '#198754', flexShrink: 0}}>
-                            <Check className="text-white" style={{width: 16, height: 16}} />
+                          <div className="d-flex align-items-center justify-content-center rounded-circle bg-success flex-shrink-0" style={{width: 24, height: 24}}>
+                            <Check className="text-white" size={16} />
                           </div>
                         ) : (
-                          <div className="border-2 rounded-circle" style={{width: 24, height: 24, flexShrink: 0}} />
+                          <div className="border rounded-circle flex-shrink-0" style={{width: 24, height: 24}} />
                         )}
                         <h5 className="mb-0 fw-semibold">{lesson.title}</h5>
                       </div>
 
                       <div className="d-flex flex-wrap align-items-center gap-2 ms-4">
-                        <Badge className={getStatusColor(lesson.status)}>
+                        <Badge bg={getStatusVariant(lesson.status)}>
                           {lesson.status === 'in-progress' ? '▶ In Progress' : lesson.status}
                         </Badge>
-                        <Badge className={getDifficultyColor(lesson.difficulty)}>
+                        <Badge bg={getDifficultyVariant(lesson.difficulty)}>
                           {lesson.difficulty}
                         </Badge>
                         <span className="small text-muted">{lesson.subject}</span>
@@ -168,25 +161,23 @@ export function LessonPlanner() {
 
                       <div className="d-flex align-items-center gap-3 mt-2 ms-4 small text-muted flex-wrap">
                         <span className="d-flex align-items-center gap-1">
-                          <Clock style={{width: 12, height: 12}} />
+                          <Clock size={12} />
                           {lesson.duration}
                         </span>
                         <span className="d-flex align-items-center gap-1">
-                          <Calendar style={{width: 12, height: 12}} />
+                          <Calendar size={12} />
                           {lesson.scheduledFor}
                         </span>
                       </div>
                     </div>
 
                     <ChevronRight
-                      className={`text-muted transition-transform flex-shrink-0 ${
-                        expandedLesson === lesson.id ? 'rotate-90' : ''
-                      }`}
-                      style={{width: 20, height: 20}}
+                      size={20}
+                      className="text-muted flex-shrink-0"
+                      style={{ transform: expandedLesson === lesson.id ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease-in-out' }}
                     />
                   </div>
 
-                  {/* Expanded content */}
                   <AnimatePresence>
                     {expandedLesson === lesson.id && (
                       <motion.div
@@ -204,19 +195,19 @@ export function LessonPlanner() {
                           {lesson.status === 'scheduled' && (
                             <Button
                               size="sm"
-                              className="btn btn-primary"
+                              variant="primary"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleStartLesson(lesson.id);
                               }}
                             >
-                              <BookOpen style={{width: 16, height: 16}} className="me-1" />
+                              <BookOpen size={16} className="me-1" />
                               Start Now
                             </Button>
                           )}
                           <Button
                             size="sm"
-                            className="btn btn-outline-secondary"
+                            variant="outline-secondary"
                             onClick={(e) => {
                               e.stopPropagation();
                               announceAction('Rescheduling lesson');
@@ -234,26 +225,26 @@ export function LessonPlanner() {
           </AnimatePresence>
         </div>
 
-        {/* Empty state */}
         {lessons.length === 0 && (
           <div className="text-center py-5">
-            <BookOpen style={{width: 64, height: 64}} className="text-secondary mx-auto mb-3" />
+            <BookOpen size={64} className="text-secondary mx-auto mb-3" />
             <p className="text-muted mb-2">No lessons scheduled yet</p>
             <p className="small text-secondary">Say "Plan a lesson" to get started</p>
           </div>
         )}
 
-        {/* Voice command help */}
         <div className="pt-3 border-top">
-          <button
-            className="btn btn-link btn-sm w-100 d-flex align-items-center justify-content-center gap-2 text-primary text-decoration-none py-2"
+          <Button
+            variant="link"
+            size="sm"
+            className="w-100 d-flex align-items-center justify-content-center gap-2 text-primary text-decoration-none py-2"
             aria-label="Use voice commands to manage lessons"
           >
-            <Mic style={{width: 16, height: 16}} />
+            <Mic size={16} />
             <span>Say "Plan a lesson" or "Show my schedule"</span>
-          </button>
+          </Button>
         </div>
-      </CardContent>
+      </Card.Body>
     </Card>
   );
 }

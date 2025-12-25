@@ -1,13 +1,12 @@
 import { motion } from 'framer-motion';
 import { Mic, BookOpen, Target, BarChart3, Settings, HelpCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../UI/card';
+import { Card } from 'react-bootstrap';
 
 const voiceCommands = [
   {
     category: 'Learning',
     icon: BookOpen,
-    color: 'text-primary',
-    bgColor: 'bg-primary',
+    variant: 'primary',
     commands: [
       { phrase: '"Start a lesson"', action: 'Begin your next scheduled lesson' },
       { phrase: '"Teach me about [topic]"', action: 'Start learning about any subject' },
@@ -19,8 +18,7 @@ const voiceCommands = [
   {
     category: 'Progress',
     icon: BarChart3,
-    color: 'text-info',
-    bgColor: 'bg-info',
+    variant: 'info',
     commands: [
       { phrase: '"Show my progress"', action: 'View learning statistics' },
       { phrase: '"What did I learn today?"', action: 'Daily summary' },
@@ -31,8 +29,7 @@ const voiceCommands = [
   {
     category: 'Planning',
     icon: Target,
-    color: 'text-success',
-    bgColor: 'bg-success',
+    variant: 'success',
     commands: [
       { phrase: '"Plan a lesson"', action: 'Schedule new learning session' },
       { phrase: '"Create project"', action: 'Start a new project' },
@@ -43,8 +40,7 @@ const voiceCommands = [
   {
     category: 'Settings',
     icon: Settings,
-    color: 'text-warning',
-    bgColor: 'bg-warning',
+    variant: 'warning',
     commands: [
       { phrase: '"Change voice"', action: 'Select different AI voice' },
       { phrase: '"Speak slower" / "faster"', action: 'Adjust voice speed' },
@@ -56,33 +52,33 @@ const voiceCommands = [
 
 export function QuickActionsGuide() {
   return (
-    <Card className="border">
-      <CardHeader>
-        <CardTitle className="d-flex align-items-center gap-2">
+    <Card>
+      <Card.Header>
+        <Card.Title as="h5" className="d-flex align-items-center gap-2">
           <Mic className="text-primary" />
           Voice Commands Guide
-        </CardTitle>
-      </CardHeader>
+        </Card.Title>
+      </Card.Header>
 
-      <CardContent>
+      <Card.Body>
         {voiceCommands.map((category, categoryIndex) => {
           const Icon = category.icon;
           return (
             <motion.div key={category.category} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: categoryIndex * 0.1 }} className="mb-3">
               <div className="d-flex align-items-center gap-2 mb-2">
-                <div className="d-inline-flex align-items-center justify-content-center rounded" style={{width:32,height:32, background: category.bgColor==='bg-primary'?'#f3e8ff': category.bgColor==='bg-info'?'#e6f0ff': category.bgColor==='bg-success'?'#ecfdf5':'#fff4e6'}}>
-                  <Icon className={category.color==='text-primary'?'text-primary': category.color==='text-info'?'text-info': category.color==='text-success'?'text-success':'text-warning'} />
+                <div className={`d-inline-flex align-items-center justify-content-center rounded bg-${category.variant}-subtle`} style={{ width: 32, height: 32 }}>
+                  <Icon className={`text-${category.variant}`} />
                 </div>
-                <h4 className="mb-0">{category.category}</h4>
+                <h4 className="mb-0 h6">{category.category}</h4>
               </div>
 
               <div className="ms-3">
                 {category.commands.map((command, commandIndex) => (
                   <motion.div key={commandIndex} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: categoryIndex * 0.1 + commandIndex * 0.05 }} className="mb-2">
-                    <div className="d-flex align-items-start gap-3 p-2 rounded" style={{cursor:'default'}}>
-                      <div style={{width:8,height:8, background:'#a78bfa', borderRadius:999, marginTop:6}} />
+                    <div className="d-flex align-items-start gap-3 p-2 rounded">
+                      <div className={`bg-${category.variant}`} style={{ width: 8, height: 8, borderRadius: '50%', marginTop: 6, flexShrink: 0 }} />
                       <div className="flex-grow-1">
-                        <code className="small fw-medium text-primary bg-light px-2 py-1 rounded">{command.phrase}</code>
+                        <code className={`small fw-normal text-${category.variant} bg-${category.variant}-subtle px-2 py-1 rounded`}>{command.phrase}</code>
                         <p className="small text-muted mt-1 mb-0">{command.action}</p>
                       </div>
                     </div>
@@ -93,9 +89,8 @@ export function QuickActionsGuide() {
           );
         })}
 
-        {/* Help footer */}
         <div className="pt-3 border-top">
-          <div className="d-flex align-items-start gap-3 p-3" style={{background:'#e8f4ff', borderRadius:8}}>
+          <div className="d-flex align-items-start gap-3 p-3 bg-primary-subtle rounded">
             <HelpCircle className="text-primary" />
             <div className="flex-grow-1">
               <h5 className="small fw-semibold mb-1">Need Help?</h5>
@@ -104,11 +99,10 @@ export function QuickActionsGuide() {
           </div>
         </div>
 
-        {/* Accessibility note */}
         <div className="pt-3 border-top text-center">
           <p className="small text-muted mb-0">💡 <strong>Accessibility Tip:</strong> All visual elements have spoken descriptions. You can navigate this entire dashboard using only your voice.</p>
         </div>
-      </CardContent>
+      </Card.Body>
     </Card>
   );
 }

@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Award, BookOpen, Target, TrendingUp, Clock, CheckCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../UI/card';
-import { Progress } from '../../UI/progress';
+import { Card, ProgressBar, Button } from 'react-bootstrap';
 
 const mockProgress = [
   {
@@ -11,7 +10,7 @@ const mockProgress = [
     totalLessons: 20,
     timeSpent: '4h 30m',
     lastAccessed: '2 hours ago',
-    color: 'bg-primary',
+    variant: 'primary',
   },
   {
     subject: 'Science',
@@ -20,7 +19,7 @@ const mockProgress = [
     totalLessons: 20,
     timeSpent: '3h 15m',
     lastAccessed: '1 day ago',
-    color: 'bg-success',
+    variant: 'success',
   },
   {
     subject: 'History',
@@ -29,7 +28,7 @@ const mockProgress = [
     totalLessons: 20,
     timeSpent: '6h 45m',
     lastAccessed: '3 hours ago',
-    color: 'bg-info',
+    variant: 'info',
   },
 ];
 
@@ -46,10 +45,10 @@ export function ProgressTracker() {
       {/* Overview Stats */}
       <div className="row g-2 g-md-3">
         <div className="col-6 col-lg-3">
-          <Card className="border h-100">
-            <CardContent className="pt-3">
+          <Card className="h-100">
+            <Card.Body>
               <div className="d-flex align-items-center gap-3">
-                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{width: 48, height: 48, background: '#f3e8ff'}}>
+                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{ width: 48, height: 48, background: '#f3e8ff' }}>
                   <BookOpen className="text-primary" />
                 </div>
                 <div>
@@ -57,15 +56,15 @@ export function ProgressTracker() {
                   <div className="small text-muted">Lessons Done</div>
                 </div>
               </div>
-            </CardContent>
+            </Card.Body>
           </Card>
         </div>
 
         <div className="col-6 col-lg-3">
-          <Card className="border h-100">
-            <CardContent className="pt-3">
+          <Card className="h-100">
+            <Card.Body>
               <div className="d-flex align-items-center gap-3">
-                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{width: 48, height: 48, background: '#e6f0ff'}}>
+                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{ width: 48, height: 48, background: '#e6f0ff' }}>
                   <Clock className="text-info" />
                 </div>
                 <div>
@@ -73,15 +72,15 @@ export function ProgressTracker() {
                   <div className="small text-muted">Study Time</div>
                 </div>
               </div>
-            </CardContent>
+            </Card.Body>
           </Card>
         </div>
 
         <div className="col-6 col-lg-3">
-          <Card className="border h-100">
-            <CardContent className="pt-3">
+          <Card className="h-100">
+            <Card.Body>
               <div className="d-flex align-items-center gap-3">
-                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{width: 48, height: 48, background: '#ecfdf5'}}>
+                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{ width: 48, height: 48, background: '#ecfdf5' }}>
                   <Target className="text-success" />
                 </div>
                 <div>
@@ -89,15 +88,15 @@ export function ProgressTracker() {
                   <div className="small text-muted">Day Streak</div>
                 </div>
               </div>
-            </CardContent>
+            </Card.Body>
           </Card>
         </div>
 
         <div className="col-6 col-lg-3">
-          <Card className="border h-100">
-            <CardContent className="pt-3">
+          <Card className="h-100">
+            <Card.Body>
               <div className="d-flex align-items-center gap-3">
-                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{width: 48, height: 48, background: '#fffbeb'}}>
+                <div className="d-flex align-items-center justify-content-center rounded-circle" style={{ width: 48, height: 48, background: '#fffbeb' }}>
                   <Award className="text-warning" />
                 </div>
                 <div>
@@ -105,20 +104,20 @@ export function ProgressTracker() {
                   <div className="small text-muted">Achievements</div>
                 </div>
               </div>
-            </CardContent>
+            </Card.Body>
           </Card>
         </div>
       </div>
 
       {/* Subject Progress */}
-      <Card className="border">
-        <CardHeader>
-          <CardTitle className="d-flex align-items-center gap-2">
+      <Card>
+        <Card.Header>
+          <Card.Title as="h5" className="d-flex align-items-center gap-2">
             <TrendingUp className="text-primary" />
             Your Learning Progress
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </Card.Title>
+        </Card.Header>
+        <Card.Body>
           {mockProgress.map((subject, index) => (
             <motion.div
               key={subject.subject}
@@ -133,20 +132,20 @@ export function ProgressTracker() {
                     <h4 className="mb-0 fw-semibold">{subject.subject}</h4>
                     <span className="small fw-semibold text-primary">{subject.progress}%</span>
                   </div>
-                  <Progress value={subject.progress} className="h-2" />
+                  <ProgressBar now={subject.progress} variant={subject.variant} style={{ height: '8px' }} />
                 </div>
               </div>
 
-              <div className="row g-2 mt-2 text-sm flex-wrap\">
-                <div className="col-4 d-flex align-items-center gap-2 text-muted">
-                  <CheckCircle className="text-success" style={{width: 16, height: 16}} />
+              <div className="row g-2 mt-2">
+                <div className="col-auto d-flex align-items-center gap-2 text-muted">
+                  <CheckCircle className="text-success" size={16} />
                   <span className="small">{subject.lessons}/{subject.totalLessons} lessons</span>
                 </div>
-                <div className="col-4 d-flex align-items-center gap-2 text-muted">
-                  <Clock className="text-info" style={{width: 16, height: 16}} />
+                <div className="col-auto d-flex align-items-center gap-2 text-muted">
+                  <Clock className="text-info" size={16} />
                   <span className="small">{subject.timeSpent}</span>
                 </div>
-                <div className="col-4 text-muted">
+                <div className="col-auto text-muted ms-auto">
                   <span className="small">Last: {subject.lastAccessed}</span>
                 </div>
               </div>
@@ -154,44 +153,45 @@ export function ProgressTracker() {
             </motion.div>
           ))}
 
-          {/* Voice command hint */}
           <div className="pt-3 border-top">
-            <button
-              className="btn btn-link btn-sm w-100 text-primary text-decoration-none py-2"
+            <Button
+              variant="link"
+              size="sm"
+              className="w-100 text-primary text-decoration-none py-2"
               aria-label="Say 'show my progress' to hear details"
             >
               💬 Say "Show my progress" to hear details
-            </button>
+            </Button>
           </div>
-        </CardContent>
+        </Card.Body>
       </Card>
 
       {/* Achievements */}
-      <Card className="border">
-        <CardHeader>
-          <CardTitle className="d-flex align-items-center gap-2">
+      <Card>
+        <Card.Header>
+          <Card.Title as="h5" className="d-flex align-items-center gap-2">
             <Award className="text-warning" />
             Achievements
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </Card.Title>
+        </Card.Header>
+        <Card.Body>
           <div className="row g-3 mb-3">
             {achievements.map((achievement) => (
               <div key={achievement.id} className="col-6 col-md-3">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className={`p-3 rounded border text-center transition-all cursor-pointer ${
+                  className={`p-3 rounded border text-center ${
                     achievement.earned
-                      ? 'bg-light border-warning border-2'
-                      : 'bg-light-gray border-secondary opacity-50'
+                      ? 'bg-light border-warning'
+                      : 'bg-light opacity-50'
                   }`}
                   role="button"
                   tabIndex={0}
                   aria-label={`${achievement.name} achievement ${achievement.earned ? 'earned' : 'not yet earned'}`}
-                  style={{minHeight: 140, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}
+                  style={{ minHeight: 140, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}
                 >
-                  <div style={{fontSize: 32}} className="mb-2">{achievement.icon}</div>
-                  <div className="small fw-medium">{achievement.name}</div>
+                  <div style={{ fontSize: 32 }} className="mb-2">{achievement.icon}</div>
+                  <div className="small fw-normal">{achievement.name}</div>
                   {achievement.earned && (
                     <div className="small text-success mt-1">✓ Earned</div>
                   )}
@@ -200,16 +200,17 @@ export function ProgressTracker() {
             ))}
           </div>
 
-          {/* Voice command hint */}
           <div className="pt-3 border-top">
-            <button
-              className="btn btn-link btn-sm w-100 text-primary text-decoration-none py-2"
+            <Button
+              variant="link"
+              size="sm"
+              className="w-100 text-primary text-decoration-none py-2"
               aria-label="Say 'what are my achievements' to hear about them"
             >
               💬 Say "What are my achievements?" to learn more
-            </button>
+            </Button>
           </div>
-        </CardContent>
+        </Card.Body>
       </Card>
     </div>
   );
