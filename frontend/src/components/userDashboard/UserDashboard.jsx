@@ -27,6 +27,14 @@ export default function UserDashboard() {
     setIsMobileMenuOpen(false);
   };
 
+  // current navigation system
+  const navOptions = {
+    "learn": "Voice Learning",
+    "progress": "My Progress",
+    "lessons": "Lesson Plans",
+    "projects": "Projects",
+  }
+
   return (
     <div className="min-vh-100" style={{ backgroundColor: '#f7fafc' }}>
       {/* Top Status Bar - Fixed */}
@@ -170,38 +178,17 @@ export default function UserDashboard() {
           {/* Desktop nav + content (minimal, rounded, neutral) */}
           <div className="d-none d-lg-block mt-3">
             <div style={{ display: 'flex', gap: 8, backgroundColor: '#ffffff', padding: 6, borderRadius: 12, boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
-              <button
-                onClick={() => handleTabSelect('learn')}
-                style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: activeTab === 'learn' ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === 'learn' ? 700 : 500 }}
-                className="btn"
-              >
-                🎤 Voice Learning
-              </button>
-
-              <button
-                onClick={() => handleTabSelect('lessons')}
-                style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: activeTab === 'lessons' ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === 'lessons' ? 700 : 500 }}
-                className="btn"
-              >
-                📚 Lesson Plans
-              </button>
-
-              <button
-                onClick={() => handleTabSelect('progress')}
-                style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: activeTab === 'progress' ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === 'progress' ? 700 : 500 }}
-                className="btn"
-              >
-                📊 My Progress
-              </button>
-
-              <div style={{ flex: 1 }} />
-              <button
-                onClick={() => handleTabSelect('projects')}
-                style={{ padding: '6px 10px', borderRadius: 10, border: 'none', backgroundColor: activeTab === 'projects' ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === 'projects' ? 700 : 500, opacity: 0.85 }}
-                className="btn"
-              >
-                🎯 Projects
-              </button>
+              
+              { navOptions && Object.entries(navOptions).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => handleTabSelect(key)}
+                  style={{ padding: '8px 14px', borderRadius: 10, border: 'none', backgroundColor: activeTab === key ? '#f3f4f6' : 'transparent', color: '#000', fontWeight: activeTab === key ? 700 : 500 }}
+                  className="btn"
+                >
+                  { label } 
+                </button>
+              ))}
             </div>
 
             <div className="mt-3">
