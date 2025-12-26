@@ -1,3 +1,4 @@
+# backend/app/api/users.py
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from marshmallow import Schema, fields

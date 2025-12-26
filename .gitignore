@@ -302,3 +302,6 @@ clean.sh
 
 # ignore the DS store files
 .DS_Store
+
+# Ignore application log files
+backend/app/logs/
