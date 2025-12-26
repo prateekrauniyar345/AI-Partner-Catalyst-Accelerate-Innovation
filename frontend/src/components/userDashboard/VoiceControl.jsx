@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume1 } from "lucide-react";
 import { Button } from "react-bootstrap";
+import { useConversation } from "@elevenlabs/react";
 
 
 
@@ -33,12 +34,9 @@ export function VoiceControl({ onVoiceInput, isAlwaysListening = false }) {
   const [state, setState] = useState("idle");
   const [waveform, setWaveform] = useState([]);
 
-
-  // ------------------------------------------
-  // set up the 11labs voice agent
-  // ------------------------------------------
+  // env-driven IDs (avoid hard-coded values)
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID;
-  
+
   const overrides = {
     agent: {
       prompt: { prompt: systemPrompt.trim() },
@@ -48,32 +46,25 @@ export function VoiceControl({ onVoiceInput, isAlwaysListening = false }) {
     },
     tts: {
       voiceId: "5kMbtRSEKIkRZSdXxrZg",
-      // camelCase (NOT model_id)
       modelId: "eleven_turbo_v2_5",
       stability: 0.5,
-      //camelCase (NOT similarity_boost)
       similarityBoost: 0.75,
     },
   };
-  
-  // const conversation = useConversation({
-  //   overrides,
-  //   clientTools: {
-  //     show_resource: async ({ resource_url }) => {
-  //       console.log("Tool Triggered! Showing resource:", resource_url);
-  //       alert(`Agent wants to show: ${resource_url}`);
-  //       return "Resource displayed successfully";
-  //     },
-  //   },
-  //   onConnect: () => console.log("Connected to ElevenLabs!"),
-  //   onDisconnect: (info) => console.warn("Disconnected from ElevenLabs", info),
-  //   onError: (error) => console.error("ElevenLabs Error:", error),
-  // });
 
-  
-  
-  // if (!agentId) return <div>Error: VITE_ELEVENLABS_AGENT_ID is not set in .env</div>;
-
+  const conversation = useConversation({
+      overrides,
+      clientTools: {
+        show_resource: async ({ resource_url }) => {
+          console.log("Tool Triggered! Showing resource:", resource_url);
+          alert(`Agent wants to show: ${resource_url}`);
+          return "Resource displayed successfully";
+        },
+      },
+      onConnect: () => console.log("Connected to ElevenLabs!"),
+      onDisconnect: (info) => console.warn("Disconnected from ElevenLabs", info),
+      onError: (error) => console.error("ElevenLabs Error:", error),
+    });
 
   useEffect(() => {
     // Generate random waveform for visual feedback
@@ -87,28 +78,107 @@ export function VoiceControl({ onVoiceInput, isAlwaysListening = false }) {
     }
   }, [state]);
 
-  const handleToggle = () => {
-    if (state === "idle") {
+  // SpeechRecognition integration (capture user's speech to text)
+  const recognitionRef = {}
+
+  const startListening = async() => {
+
+    // first convey the agent greeting message if not already done
+    if(!agentId) return; 
+
+    try {
+      await conversation.startSession({ agentId, connectionType: "websocket" });
+      console.log("Conversation session initiated");
+    } catch (err) {
+      console.error("Failed to start session:", err);
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      // fallback: prompt for text
+      const text = window.prompt("Speech recognition not supported. Type your message:");
+      if (text) sendTranscript(text);
+      return;
+    }
+    const recog = new SpeechRecognition();
+    recog.lang = "en-US";
+    recog.interimResults = false;
+    recog.maxAlternatives = 1;
+    recog.onstart = () => {
       setState("listening");
       playSound("start");
       announceToScreen("Listening");
+    };
 
-      setTimeout(() => {
-        setState("processing");
-        announceToScreen("Processing");
-        setTimeout(() => {
-          setState("speaking");
-          announceToScreen("Responding");
-          onVoiceInput?.("Sample voice input");
-          setTimeout(() => {
-            setState("idle");
-          }, 3000);
-        }, 1500);
-      }, 3000);
-    } else if (state === "listening") {
+    recog.onresult = (ev) => {
+      const transcript = Array.from(ev.results)
+        .map((r) => r[0].transcript)
+        .join(" ");
+      if (transcript) {
+        sendTranscript(transcript);
+      }
+    };
+
+    recog.onerror = (err) => {
+      console.error("SpeechRecognition error:", err);
       setState("idle");
-      playSound("stop");
-      announceToScreen("Stopped listening");
+      announceToScreen("Recognition error");
+    };
+
+    recog.onend = () => {
+      // if no result was captured, return to idle
+      if (state === "listening") {
+        setState("idle");
+        announceToScreen("Stopped listening");
+      }
+    };
+
+    recognitionRef.current = recog;
+    try {
+      recog.start();
+    } catch (e) {
+      console.error("Failed to start recognition", e);
+    }
+  };
+
+  const stopListening = () => {
+    const r = recognitionRef.current;
+    if (r && typeof r.stop === "function") {
+      r.stop();
+    }
+    setState("idle");
+    playSound("stop");
+    announceToScreen("Stopped listening");
+  };
+
+  const handleToggle = () => {
+    if (state === "idle") {
+      startListening();
+    } else if (state === "listening") {
+      stopListening();
+    }
+  };
+
+  // send transcript to the agent via conversation hook
+  const sendTranscript = async (transcript) => {
+    announceToScreen("Processing");
+    setState("processing");
+    onVoiceInput?.(transcript);
+
+    try {
+      if (conversation && typeof conversation.sendMessage === "function") {
+        await conversation.sendMessage({ text: transcript });
+      } else if (conversation && typeof conversation.send === "function") {
+        await conversation.send(transcript);
+      } else if (conversation && typeof conversation.createMessage === "function") {
+        await conversation.createMessage(transcript);
+      } else {
+        console.warn("No send method on conversation");
+      }
+    } catch (err) {
+      console.error("Failed to send transcript to agent:", err);
+      setState("idle");
+      return;
     }
   };
 
@@ -154,6 +224,25 @@ export function VoiceControl({ onVoiceInput, isAlwaysListening = false }) {
   };
 
   const currentConfig = stateConfig[state];
+
+  if (!agentId) return <div>Error: VITE_ELEVENLABS_AGENT_ID is not set in .env</div>;
+  // observe conversation messages to detect when the agent replied
+  useEffect(() => {
+    if (!conversation) return;
+    const msgs = conversation.messages || [];
+    if (msgs.length === 0) return;
+    const last = msgs[msgs.length - 1];
+    // When an assistant/agent message arrives, assume speaking starts
+    if (last && (last.role === "assistant" || last.from === "agent" || last.author === "assistant")) {
+      setState("speaking");
+      announceToScreen("Responding");
+
+      // heuristic: clear speaking state after TTS would have played
+      const speakTimeout = Math.max(1500, (String(last.content || last.text || "") .length / 20) * 1000);
+      const t = setTimeout(() => setState("idle"), speakTimeout);
+      return () => clearTimeout(t);
+    }
+  }, [conversation && conversation.messages]);
 
   return (
     <div className="d-flex flex-column align-items-center gap-3">
