@@ -109,6 +109,7 @@ export function VoiceControl({ onVoiceInput }) {
     recog.continuous = true;
 
     recog.onstart = () => {
+      console.log("✅ Speech recognition STARTED - speak now!");
       setState("listening");
       announceToScreen("Listening");
     };
@@ -117,6 +118,7 @@ export function VoiceControl({ onVoiceInput }) {
       const transcript = Array.from(ev.results)
         .map((r) => r[0].transcript)
         .join(" ");
+      console.log("🎤 Transcribed:", transcript);
       if (transcript.trim()) sendTranscript(transcript);
     };
 
@@ -131,8 +133,7 @@ export function VoiceControl({ onVoiceInput }) {
 
       // Handle aborted (user stopped or browser blocked)
       if (err.error === "aborted") {
-        setState("idle");
-        announceToScreen("Click to start listening");
+        console.log("Recognition aborted");
         return;
       }
 
@@ -141,24 +142,28 @@ export function VoiceControl({ onVoiceInput }) {
         console.log('Speech recognition:', err.error);
         return;
       }
-      
       console.error("SpeechRecognition error:", err);
     };
 
-    // recog.onend = () => {
-    //   // Auto-restart if still active and not manually stopped
-    //   if (recognitionRef.current && recognitionRef.current === recog) {
-    //     setTimeout(() => {
-    //       if (recognitionRef.current === recog) {
-    //         try {
-    //           recog.start();
-    //         } catch (e) {
-    //           // Silently ignore restart failures
-    //         }
-    //       }
-    //     }, 500);
-    //   }
-    // };
+    recog.onend = () => {
+      console.log("Speech recognition ended - will auto-restart");
+      // Auto-restart after a delay to keep continuous listening
+      setTimeout(() => {
+        if (recognitionRef.current === recog && state !== "idle") {
+          try {
+            recog.start();
+            console.log("🔄 Recognition restarted");
+          } catch (e) {
+            if (e.message.includes('already started')) {
+              console.log("Recognition already running");
+            } else {
+              console.log("Could not restart:", e.message);
+            }
+          }
+        }
+      }, 500);
+    };
+
 
     recognitionRef.current = recog;
     try {
@@ -179,40 +184,6 @@ export function VoiceControl({ onVoiceInput }) {
     announceToScreen("Stopped listening");
   };
 
-  // Start ElevenLabs session (guarded against StrictMode double-run)
-  // useEffect(() => {
-  //   if (!agentId || conversation.status === "connected") return;
-  //   // 1. Create a controller to track if this specific effect run is still valid
-  //   let isCurrentRequest = true;
-  //   const startAutoSession = async () => {
-  //     try {
-  //       // 2. Add a tiny delay to allow the DOM/Mic to settle
-  //       await new Promise(resolve => setTimeout(resolve, 500));
-
-  //       // 3. Only proceed if the component hasn't unmounted or re-run
-  //       if (isCurrentRequest && conversation.status === "disconnected") {
-  //         console.log("Auto-starting ElevenLabs session...");
-  //         await conversation.startSession({ 
-  //           agentId, 
-  //           connectionType: "websocket" 
-  //         });
-  //       }
-  //     } catch (err) {
-  //       // 4. Silently catch "cancelled" errors as they are expected in StrictMode
-  //       if (err.message !== "Session cancelled during connection") {
-  //         console.error("Failed to start session:", err);
-  //       }
-  //     }
-  //   };
-  //   startAutoSession();
-  //   // 5. Cleanup function: Mark this request as invalid if the effect re-runs
-  //   return () => {
-  //     isCurrentRequest = false;
-  //     if (conversation.status === "connected") {
-  //       conversation.endSession().catch(() => {});
-  //     }
-  //   };
-  // }, [agentId]);
 
 
   useEffect(() => {
