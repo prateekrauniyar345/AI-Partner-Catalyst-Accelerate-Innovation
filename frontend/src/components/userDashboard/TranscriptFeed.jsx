@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Sparkles, Volume1, Copy, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button, Card } from 'react-bootstrap';
+import { useConversation } from '@elevenlabs/react';
 
 export function TranscriptFeed({ isCollapsed = false, onToggleCollapse }) {
   const [messages, setMessages] = useState([
