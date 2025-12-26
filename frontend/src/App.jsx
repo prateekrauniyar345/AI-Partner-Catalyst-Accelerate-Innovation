@@ -17,8 +17,7 @@ import UserDashboardPage from './pages/UserDashboardPage'
 import { UserProvider, useUser } from './contexts/userContext'
 
 function MainApp() {
-  const { user } = useUser() // optional if you don't use it yet
-  console.log(user)
+  const { user } = useUser()
 
   return (
     <>
