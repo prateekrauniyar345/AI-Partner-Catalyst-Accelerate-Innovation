@@ -6,6 +6,7 @@ const UserContext = createContext(null)
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
  
   
 
@@ -18,7 +19,10 @@ export function UserProvider({ children }) {
         // service may return {user:...} or direct object
         const userPayload = data && data.user ? data.user : data
         console.debug('/auth/me payload', userPayload)
-        if (mounted) setUser(userPayload)
+        if (mounted) {
+          setUser(userPayload)
+          setLoading(false)
+        }
         return
       } catch (err) {
         console.debug('/auth/me failed', err)
@@ -30,13 +34,19 @@ export function UserProvider({ children }) {
             const data2 = await fetchMeService()
             const userPayload2 = data2 && data2.user ? data2.user : data2
             console.debug('/auth/me payload after refresh', userPayload2)
-            if (mounted) setUser(userPayload2)
+            if (mounted) {
+              setUser(userPayload2)
+              setLoading(false)
+            }
             return
           }
         } catch (err2) {
           console.warn('Refresh + retry failed', err2)
         }
-        setUser(null)
+        if (mounted) {
+          setUser(null)
+          setLoading(false)
+        }
       }
     }
     fetchMe()
@@ -60,7 +70,7 @@ export function UserProvider({ children }) {
   }
 
   return (
-    <UserContext.Provider value={{ user, login, signOut }}>
+    <UserContext.Provider value={{ user, loading, login, signOut }}>
       {children}
     </UserContext.Provider>
   )

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, MicOff, Volume1 } from "lucide-react";
 import { Button } from "react-bootstrap";
@@ -30,11 +30,10 @@ let globalConversationInstance = null;
 
 
 export function VoiceControl({ onVoiceInput }) {
-  const [state, setState] = useState("idle");
   const [waveform, setWaveform] = useState([]);
-  const recognitionRef = useRef(null);
-  const sessionStartedRef = useRef(false);
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID;
+  // agent status can be 'idle', 'listening', 'thinking', 'speaking'
+  const [agentStatus, setAgentStatus] = useState('idle');
 
   // Debug logging
   // console.log("VoiceControl agentId:", agentId);
@@ -48,8 +47,10 @@ export function VoiceControl({ onVoiceInput }) {
     },
     tts: {
       voiceId: "5kMbtRSEKIkRZSdXxrZg",
+      // camelCase (NOT model_id)
       modelId: "eleven_turbo_v2_5",
       stability: 0.5,
+      //camelCase (NOT similarity_boost)
       similarityBoost: 0.75,
     },
   };
@@ -68,121 +69,15 @@ export function VoiceControl({ onVoiceInput }) {
     onError: (error) => console.error("ElevenLabs Error:", error),
   });
 
+
+
   // Helper to announce to screen readers
   const announceToScreen = (message) => {
     const announcement = document.getElementById("voice-announcement");
     if (announcement) announcement.textContent = message;
   };
 
-  // Send transcript to agent
-  const sendTranscript = async (transcript) => {
-    announceToScreen("Processing");
-    setState("processing");
-    onVoiceInput?.(transcript);
-
-    try {
-      if (conversation?.sendMessage) await conversation.sendMessage({ text: transcript });
-      else if (conversation?.send) await conversation.send(transcript);
-      else if (conversation?.createMessage) await conversation.createMessage(transcript);
-      else console.warn("No send method on conversation");
-    } catch (err) {
-      console.error("Failed to send transcript to agent:", err);
-      setState("idle");
-    }
-  };
   
-
-  // Start speech recognition
-  const startListening = () => {
-    if (recognitionRef.current) return; // Already running
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      const text = window.prompt("Speech recognition not supported. Type your message:");
-      if (text) sendTranscript(text);
-      return;
-    }
-
-    const recog = new SpeechRecognition();
-    recog.lang = "en-US";
-    recog.interimResults = false;
-    recog.continuous = true;
-
-    recog.onstart = () => {
-      console.log("✅ Speech recognition STARTED - speak now!");
-      setState("listening");
-      announceToScreen("Listening");
-    };
-
-    recog.onresult = (ev) => {
-      const transcript = Array.from(ev.results)
-        .map((r) => r[0].transcript)
-        .join(" ");
-      console.log("🎤 Transcribed:", transcript);
-      if (transcript.trim()) sendTranscript(transcript);
-    };
-
-    recog.onerror = (err) => {
-      // Handle permission denied
-      if (err.error === "not-allowed" || err.error === "service-not-allowed") {
-        setState("idle");
-        announceToScreen("Microphone permission denied. Click to start.");
-        recognitionRef.current = null;
-        return;
-      }
-
-      // Handle aborted (user stopped or browser blocked)
-      if (err.error === "aborted") {
-        console.log("Recognition aborted");
-        return;
-      }
-
-      // Ignore common non-critical errors
-      if (err.error === 'no-speech' || err.error === 'audio-capture') {
-        console.log('Speech recognition:', err.error);
-        return;
-      }
-      console.error("SpeechRecognition error:", err);
-    };
-
-    recog.onend = () => {
-      console.log("Speech recognition ended - will auto-restart");
-      // Auto-restart after a delay to keep continuous listening
-      setTimeout(() => {
-        if (recognitionRef.current === recog && state !== "idle") {
-          try {
-            recog.start();
-            console.log("🔄 Recognition restarted");
-          } catch (e) {
-            if (e.message.includes('already started')) {
-              console.log("Recognition already running");
-            } else {
-              console.log("Could not restart:", e.message);
-            }
-          }
-        }
-      }, 500);
-    };
-
-
-    recognitionRef.current = recog;
-    try {
-      recog.start();
-    } catch (e) {
-      console.error("Failed to start recognition", e);
-      recognitionRef.current = null;
-    }
-  };
-
-  // Stop speech recognition
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
-    }
-    setState("idle");
-    announceToScreen("Stopped listening");
-  };
 
 
 
@@ -194,9 +89,7 @@ export function VoiceControl({ onVoiceInput }) {
       console.log("Session already exists globally, skipping duplicate");
       return;
     }
-    
     let isCurrentRequest = true;
-    
     const startAutoSession = async () => {
       try {
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -209,6 +102,7 @@ export function VoiceControl({ onVoiceInput }) {
             connectionType: "websocket" 
           });
         }
+        setAgentStatus("listening");
       } catch (err) {
         if (err.message !== "Session cancelled during connection") {
           console.error("Failed to start session:", err);
@@ -216,9 +110,7 @@ export function VoiceControl({ onVoiceInput }) {
         globalConversationInstance = null;
       }
     };
-    
     startAutoSession();
-    
     return () => {
       isCurrentRequest = false;
       if (conversation.status === "connected" && globalConversationInstance === conversation) {
@@ -229,63 +121,28 @@ export function VoiceControl({ onVoiceInput }) {
   }, [agentId]);
 
 
-  // Auto-start microphone (may be blocked by browser)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      console.log("Attempting auto-start of microphone...");
-      startListening();
-    }, 800);
 
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
 
   // Waveform animation
   useEffect(() => {
-    if (state === "listening" || state === "speaking") {
+    if (agentStatus === "listening" || agentStatus === "speaking") {
       const interval = setInterval(() => {
         setWaveform(Array.from({ length: 32 }, () => Math.random()));
       }, 100);
       return () => clearInterval(interval);
     }
-  }, [state]);
+  }, [agentStatus]);
 
-  // Detect when agent responds
-  useEffect(() => {
-    if (!conversation?.messages?.length) return;
-    const last = conversation.messages[conversation.messages.length - 1];
-    
-    if (last?.role === "assistant" || last?.from === "agent") {
-      setState("speaking");
-      announceToScreen("Responding");
 
-      const speakTimeout = Math.max(1500, (String(last.content || last.text || "").length / 20) * 1000);
-      const timer = setTimeout(() => setState("listening"), speakTimeout);
-      return () => clearTimeout(timer);
-    }
-  }, [conversation?.messages]);
 
-  // Stop agent speech
-  const stopAgentSpeaking = () => {
-    const methods = ["stopStreaming", "stop", "abort", "cancel", "pause"];
-    for (const method of methods) {
-      if (conversation?.[method]) {
-        conversation[method]().catch(() => {});
-        break;
-      }
-    }
-    setState("listening");
-    announceToScreen("Stopped");
-  };
-
-  const stateConfig = {
+  const agentStatusConfig = {
     listening: { label: "👂 Listening...", icon: MicOff, pulseColor: "#93c5fd", waveColor: "#0d6efd" },
     processing: { label: "🧠 Thinking...", icon: null },
     speaking: { label: "🔊 Speaking...", icon: Volume1, pulseColor: "#86efac", waveColor: "#198754" },
   };
 
-  const config = stateConfig[state] || { label: "🎤 Ready", icon: Mic };
+  const config = agentStatusConfig[agentStatus] || { label: "🎤 Ready", icon: Mic };
 
   if (!agentId) return <div>Error: VITE_ELEVENLABS_AGENT_ID is not set in .env</div>;
 
@@ -295,7 +152,7 @@ export function VoiceControl({ onVoiceInput }) {
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={state}
+          key={agentStatus}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
@@ -306,7 +163,7 @@ export function VoiceControl({ onVoiceInput }) {
       </AnimatePresence>
 
       <div className="position-relative d-flex align-items-center justify-content-center" style={{ width: 240, height: 240 }}>
-        {(state === "listening" || state === "speaking") && (
+        {(agentStatus === "listening" || agentStatus === "speaking") && (
           <>
             {[...Array(3)].map((_, i) => (
               <motion.div
@@ -344,22 +201,22 @@ export function VoiceControl({ onVoiceInput }) {
         <Button
           as={motion.button}
           onClick={() => {
-            if (state === "idle") startListening();
+            if (agentStatus === "idle") startListening();
             else stopListening();
           }}
-          disabled={state === 'processing'}
+          disabled={agentStatus === 'processing'}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           variant="primary"
           className="rounded-circle d-flex flex-column align-items-center justify-content-center text-white"
           style={{ width: '100%', height: '100%' }}
           aria-label={
-            state === 'idle' ? 'Start listening' :
-            state === 'listening' ? 'Stop listening' :
-            state === 'processing' ? 'Processing your request' : 'AI is speaking'
+            agentStatus === 'idle' ? 'Start listening' :
+            agentStatus === 'listening' ? 'Stop listening' :
+            agentStatus === 'processing' ? 'Processing your request' : 'AI is speaking'
           }
         >
-          {state === 'processing' ? (
+          {agentStatus === 'processing' ? (
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -371,7 +228,7 @@ export function VoiceControl({ onVoiceInput }) {
           ) : (
             <Mic size={64} />
           )}
-          <span className="h5 mt-2 mb-0">{state === 'listening' ? 'Listening...' : config.label}</span>
+          <span className="h5 mt-2 mb-0">{agentStatus === 'listening' ? 'Listening...' : config.label}</span>
         </Button>
       </div>
 
@@ -379,7 +236,7 @@ export function VoiceControl({ onVoiceInput }) {
         <Button variant="success" size="sm" disabled>
           Always Listening
         </Button>
-        {state === 'speaking' && (
+        {agentStatus === 'speaking' && (
           <Button variant="danger" size="sm" onClick={stopAgentSpeaking}>
             Pause
           </Button>
