@@ -305,3 +305,8 @@ clean.sh
 
 # Ignore application log files
 backend/app/logs/
+
+
+
+# ignore the supabase migrations - node modules
+node_modules/
