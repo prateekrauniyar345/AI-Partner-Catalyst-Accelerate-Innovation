@@ -32,6 +32,7 @@ let globalSessionActive = false;
 export function VoiceAgentProvider({ children, onTabChange }) {
   const [agentStatus, setAgentStatus] = useState('idle');
   const [waveform, setWaveform] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [transcript, setTranscript] = useState('');
   const recognitionRef = useRef(null);
   const sessionStartedRef = useRef(false);
@@ -91,8 +92,46 @@ export function VoiceAgentProvider({ children, onTabChange }) {
     onError: (error) => console.error("ElevenLabs Error:", error),
     onMessage: (message) => {
       console.log("Agent message:", message);
-      if (message.source === 'ai') {
+      // Ignore echoes of user messages coming back over the socket
+      if (message?.source === 'user') {
+        return;
+      }
+
+      if (message?.source === 'ai') {
         setAgentStatus('speaking');
+      }
+
+      // robust extraction of text from various message shapes
+      const extractText = (obj) => {
+        if (!obj && obj !== 0) return '';
+        if (typeof obj === 'string') return obj;
+        if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+        if (Array.isArray(obj)) return obj.map(extractText).join('\n');
+        if (obj.message) return extractText(obj.message);
+        if (obj.text) return extractText(obj.text);
+        if (obj.content) return extractText(obj.content);
+        if (obj.output) return extractText(obj.output.text ?? obj.output.message ?? obj.output);
+        if (obj.choices && obj.choices[0]) return extractText(obj.choices[0]);
+        if (obj.role && obj.message) return extractText(obj.message);
+        try {
+          return JSON.stringify(obj);
+        } catch (e) {
+          return String(obj);
+        }
+      };
+
+      try {
+        const content = extractText(message);
+        const cleaned = content.replace(/^\s+|\s+$/g, '');
+        const msg = {
+          id: `ai-${Date.now()}-${Math.floor(Math.random()*10000)}`,
+          role: 'assistant',
+          content: cleaned,
+          timestamp: new Date(),
+        };
+        setMessages((m) => [...m, msg]);
+      } catch (e) {
+        // ignore
       }
     },
     onModeChange: (mode) => {
@@ -113,8 +152,56 @@ export function VoiceAgentProvider({ children, onTabChange }) {
     setAgentStatus('processing');
     setTranscript(text);
     
+    // add or replace user message in history (avoid duplicates / interim echoes)
     try {
-      await conversation.sendMessage(text);
+      const userMsg = {
+        id: `user-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        role: 'user',
+        content: text,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => {
+        if (!prev || prev.length === 0) return [userMsg];
+        const last = prev[prev.length - 1];
+        const lastIsUser = last?.role === 'user';
+        const lastTime = last?.timestamp ? +new Date(last.timestamp) : 0;
+        const now = Date.now();
+
+        // If the last message is a user message and it's recent, replace it
+        // This handles interim recognition updates that should replace the previous user bubble
+        if (lastIsUser && now - lastTime < 7000) {
+          // If text is identical, just refresh timestamp
+          if ((last.content || '').trim() === text.trim()) {
+            const refreshed = { ...last, timestamp: new Date(), content: text };
+            return [...prev.slice(0, -1), refreshed];
+          }
+          return [...prev.slice(0, -1), userMsg];
+        }
+
+        // Otherwise append as a new user message
+        return [...prev, userMsg];
+      });
+    } catch (e) {}
+
+    try {
+      // Prefer explicit user-message helper if available on the conversation object
+      if (conversation && typeof conversation.sendUserMessage === 'function') {
+        await conversation.sendUserMessage(text);
+      } else if (conversation && typeof conversation.sendMessage === 'function') {
+        // some versions expect an object
+        try {
+          await conversation.sendMessage({ text });
+        } catch (e) {
+          await conversation.sendMessage(text);
+        }
+      } else if (conversation && typeof conversation.send === 'function') {
+        await conversation.send(text);
+      } else if (conversation && typeof conversation.createMessage === 'function') {
+        await conversation.createMessage(text);
+      } else {
+        console.warn('No send method found on conversation; message not sent');
+      }
     } catch (err) {
       console.error("Failed to send message:", err);
       setAgentStatus('listening');
@@ -143,8 +230,10 @@ export function VoiceAgentProvider({ children, onTabChange }) {
 
     recog.onresult = (ev) => {
       const transcript = Array.from(ev.results)
+        .slice(ev.resultIndex)
         .map((r) => r[0].transcript)
-        .join(" ");
+        .join('');
+        
       console.log("🎤 Transcribed:", transcript);
       if (transcript.trim()) sendTranscript(transcript);
     };
@@ -253,12 +342,14 @@ export function VoiceAgentProvider({ children, onTabChange }) {
   const value = {
     agentStatus,
     waveform,
+    messages,
     transcript,
     conversation,
     startListening,
     stopListening,
     stopAgentSpeaking,
     sendTranscript,
+    clearMessages: () => setMessages([]),
   };
 
   return (

@@ -15,7 +15,7 @@ import ChatInterface from './components/lllabsChat/ChatInterface'
 import UserDashboardPage from './pages/UserDashboardPage'
 
 // Protected Route wrapper
-import ProtectedRoute from './components/ProtectedRoute'
+import ProtectedRoute from './components/protectedRoutes/ProtectedRoute'
 
 import { UserProvider, useUser } from './contexts/userContext'
 
