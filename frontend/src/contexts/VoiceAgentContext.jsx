@@ -35,6 +35,8 @@ export function VoiceAgentProvider({ children, onTabChange }) {
   const [messages, setMessages] = useState([]);
   const [transcript, setTranscript] = useState('');
   const recognitionRef = useRef(null);
+  const speakingRef = useRef(false);
+  const wasListeningRef = useRef(false);
   const sessionStartedRef = useRef(false);
   
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID;
@@ -99,6 +101,16 @@ export function VoiceAgentProvider({ children, onTabChange }) {
 
       if (message?.source === 'ai') {
         setAgentStatus('speaking');
+        speakingRef.current = true;
+        // pause local recognition while agent speaks to avoid recording TTS
+        if (recognitionRef.current) {
+          try {
+            wasListeningRef.current = true;
+            recognitionRef.current.stop();
+          } catch (e) {
+            // ignore
+          }
+        }
       }
 
       // robust extraction of text from various message shapes
@@ -126,9 +138,11 @@ export function VoiceAgentProvider({ children, onTabChange }) {
         const msg = {
           id: `ai-${Date.now()}-${Math.floor(Math.random()*10000)}`,
           role: 'assistant',
+          source: 'ai',
           content: cleaned,
           timestamp: new Date(),
         };
+        console.debug('Appending assistant message to history:', cleaned);
         setMessages((m) => [...m, msg]);
       } catch (e) {
         // ignore
@@ -138,8 +152,26 @@ export function VoiceAgentProvider({ children, onTabChange }) {
       console.log("Mode changed:", mode);
       if (mode.mode === 'speaking') {
         setAgentStatus('speaking');
+        speakingRef.current = true;
+        // pause recognition when agent begins speaking
+        if (recognitionRef.current) {
+          try {
+            wasListeningRef.current = true;
+            recognitionRef.current.stop();
+          } catch (e) {}
+        }
       } else if (mode.mode === 'listening') {
         setAgentStatus('listening');
+        speakingRef.current = false;
+        // resume recognition if we paused it for TTS
+        if (wasListeningRef.current && !recognitionRef.current) {
+          setTimeout(() => {
+            try {
+              startListening();
+            } catch (e) {}
+          }, 300);
+          wasListeningRef.current = false;
+        }
       }
     },
   });
@@ -157,6 +189,7 @@ export function VoiceAgentProvider({ children, onTabChange }) {
       const userMsg = {
         id: `user-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
         role: 'user',
+        source: 'user',
         content: text,
         timestamp: new Date(),
       };
@@ -182,6 +215,7 @@ export function VoiceAgentProvider({ children, onTabChange }) {
         // Otherwise append as a new user message
         return [...prev, userMsg];
       });
+      console.debug('Added/replaced user message in history:', text);
     } catch (e) {}
 
     try {
@@ -232,9 +266,15 @@ export function VoiceAgentProvider({ children, onTabChange }) {
       const transcript = Array.from(ev.results)
         .slice(ev.resultIndex)
         .map((r) => r[0].transcript)
-        .join('');
-        
+        .join(' ');
+
       console.log("Transcribed:", transcript);
+      // Ignore transcriptions captured while the agent is speaking (avoid echoing TTS)
+      if (speakingRef.current) {
+        console.log('Ignored transcript while agent speaking');
+        return;
+      }
+
       if (transcript.trim()) sendTranscript(transcript);
     };
 
