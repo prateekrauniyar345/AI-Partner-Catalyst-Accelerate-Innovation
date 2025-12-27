@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Settings, Volume2, MessageSquare, Eye, Lock, X } from 'lucide-react';
 import { Modal, Button, Form, Card } from 'react-bootstrap';
-import { useVoiceAgent } from '../../contexts/VoiceAgentContext';
 
 export function SettingsPanel({ isOpen, onClose }) {
-  const { voiceSpeed, setVoiceSpeed, voicePitch, setVoicePitch } = useVoiceAgent();
+  const [voiceSpeed, setVoiceSpeed] = useState(1.0);
+  const [voicePitch, setVoicePitch] = useState(1.0);
   const [verbosity, setVerbosity] = useState('normal');
   const [supportiveMode, setSupportiveMode] = useState(true);
   const [highContrast, setHighContrast] = useState(false);

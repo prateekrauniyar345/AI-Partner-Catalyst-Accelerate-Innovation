@@ -37,7 +37,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <VoiceAgentProvider onTabChange={setActiveTab} onSetSettingsOpen={setIsSettingsOpen}>
+    <VoiceAgentProvider onTabChange={setActiveTab}>
       <div className="min-vh-100" style={{ backgroundColor: '#f7fafc', paddingBottom: activeTab !== 'learn' ? '100px' : '0' }}>
       {/* Top Status Bar - Fixed */}
       <header className="position-fixed top-0 start-0 end-0 bg-white border-bottom shadow-sm" style={{ zIndex: 1040 }}>
