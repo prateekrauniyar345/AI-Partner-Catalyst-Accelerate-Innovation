@@ -35,8 +35,6 @@ export function VoiceAgentProvider({ children, onTabChange }) {
   const [messages, setMessages] = useState([]);
   const [transcript, setTranscript] = useState('');
   const recognitionRef = useRef(null);
-  const speakingRef = useRef(false);
-  const wasListeningRef = useRef(false);
   const sessionStartedRef = useRef(false);
   
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID;
@@ -54,6 +52,84 @@ export function VoiceAgentProvider({ children, onTabChange }) {
       similarityBoost: 0.75,
     },
   };
+
+  // Stop speech recognition
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.onend = null; // Prevent restart
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+  };
+
+  // Start speech recognition
+  const startListening = () => {
+    if (recognitionRef.current) return;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.error("Speech recognition not supported");
+      return;
+    }
+
+    const recog = new SpeechRecognition();
+    recog.lang = "en-US";
+    recog.interimResults = false;
+    recog.continuous = true;
+
+    recog.onstart = () => {
+      console.log("Speech recognition STARTED");
+    };
+
+    recog.onresult = (ev) => { 
+      if (agentStatus === 'speaking') {
+        console.log('Ignored transcript while agent speaking');
+        return;
+      }
+
+      const transcript = Array.from(ev.results)
+        .slice(ev.resultIndex)
+        .map((r) => r[0].transcript)
+        .join(' ');
+
+      console.log("Transcribed:", transcript);
+      if (transcript.trim()) sendTranscript(transcript);
+    };
+
+    recog.onerror = (err) => {
+      if (err.error === "not-allowed" || err.error === 'no-speech' || err.error === 'audio-capture' || err.error === 'aborted') {
+        // Known errors, just log and stop
+        console.warn(`SpeechRecognition error: ${err.error}`);
+        stopListening();
+        setAgentStatus('idle'); // Go to idle if mic fails
+        return;
+      }
+      console.error("SpeechRecognition error:", err);
+    };
+
+    recog.onend = () => {
+      console.log("Speech recognition ended.");
+      // The logic to restart is now handled by the useEffect watching agentStatus
+    };
+
+    recognitionRef.current = recog;
+    try {
+      recog.start();
+    } catch (e) {
+      console.error("Failed to start recognition", e);
+      recognitionRef.current = null;
+    }
+  };
+  
+  // Effect to manage microphone based on agent status
+  useEffect(() => {
+    if (agentStatus === 'speaking') {
+      stopListening();
+    } else if (agentStatus === 'listening') {
+      startListening();
+    }
+  }, [agentStatus]);
+
 
   const conversation = useConversation({
     overrides,
@@ -94,26 +170,14 @@ export function VoiceAgentProvider({ children, onTabChange }) {
     onError: (error) => console.error("ElevenLabs Error:", error),
     onMessage: (message) => {
       console.log("Agent message:", message);
-      // Ignore echoes of user messages coming back over the socket
       if (message?.source === 'user') {
         return;
       }
 
       if (message?.source === 'ai') {
         setAgentStatus('speaking');
-        speakingRef.current = true;
-        // pause local recognition while agent speaks to avoid recording TTS
-        if (recognitionRef.current) {
-          try {
-            wasListeningRef.current = true;
-            recognitionRef.current.stop();
-          } catch (e) {
-            // ignore
-          }
-        }
       }
 
-      // robust extraction of text from various message shapes
       const extractText = (obj) => {
         if (!obj && obj !== 0) return '';
         if (typeof obj === 'string') return obj;
@@ -125,11 +189,7 @@ export function VoiceAgentProvider({ children, onTabChange }) {
         if (obj.output) return extractText(obj.output.text ?? obj.output.message ?? obj.output);
         if (obj.choices && obj.choices[0]) return extractText(obj.choices[0]);
         if (obj.role && obj.message) return extractText(obj.message);
-        try {
-          return JSON.stringify(obj);
-        } catch (e) {
-          return String(obj);
-        }
+        try { return JSON.stringify(obj); } catch (e) { return String(obj); }
       };
 
       try {
@@ -142,7 +202,6 @@ export function VoiceAgentProvider({ children, onTabChange }) {
           content: cleaned,
           timestamp: new Date(),
         };
-        console.debug('Appending assistant message to history:', cleaned);
         setMessages((m) => [...m, msg]);
       } catch (e) {
         // ignore
@@ -152,26 +211,8 @@ export function VoiceAgentProvider({ children, onTabChange }) {
       console.log("Mode changed:", mode);
       if (mode.mode === 'speaking') {
         setAgentStatus('speaking');
-        speakingRef.current = true;
-        // pause recognition when agent begins speaking
-        if (recognitionRef.current) {
-          try {
-            wasListeningRef.current = true;
-            recognitionRef.current.stop();
-          } catch (e) {}
-        }
       } else if (mode.mode === 'listening') {
         setAgentStatus('listening');
-        speakingRef.current = false;
-        // resume recognition if we paused it for TTS
-        if (wasListeningRef.current && !recognitionRef.current) {
-          setTimeout(() => {
-            try {
-              startListening();
-            } catch (e) {}
-          }, 300);
-          wasListeningRef.current = false;
-        }
       }
     },
   });
@@ -184,7 +225,6 @@ export function VoiceAgentProvider({ children, onTabChange }) {
     setAgentStatus('processing');
     setTranscript(text);
     
-    // add or replace user message in history (avoid duplicates / interim echoes)
     try {
       const userMsg = {
         id: `user-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
@@ -193,42 +233,15 @@ export function VoiceAgentProvider({ children, onTabChange }) {
         content: text,
         timestamp: new Date(),
       };
-
-      setMessages((prev) => {
-        if (!prev || prev.length === 0) return [userMsg];
-        const last = prev[prev.length - 1];
-        const lastIsUser = last?.role === 'user';
-        const lastTime = last?.timestamp ? +new Date(last.timestamp) : 0;
-        const now = Date.now();
-
-        // If the last message is a user message and it's recent, replace it
-        // This handles interim recognition updates that should replace the previous user bubble
-        if (lastIsUser && now - lastTime < 7000) {
-          // If text is identical, just refresh timestamp
-          if ((last.content || '').trim() === text.trim()) {
-            const refreshed = { ...last, timestamp: new Date(), content: text };
-            return [...prev.slice(0, -1), refreshed];
-          }
-          return [...prev.slice(0, -1), userMsg];
-        }
-
-        // Otherwise append as a new user message
-        return [...prev, userMsg];
-      });
-      console.debug('Added/replaced user message in history:', text);
+      setMessages((prev) => [...prev, userMsg]);
+      console.debug('Added user message to history:', text);
     } catch (e) {}
 
     try {
-      // Prefer explicit user-message helper if available on the conversation object
       if (conversation && typeof conversation.sendUserMessage === 'function') {
         await conversation.sendUserMessage(text);
       } else if (conversation && typeof conversation.sendMessage === 'function') {
-        // some versions expect an object
-        try {
-          await conversation.sendMessage({ text });
-        } catch (e) {
-          await conversation.sendMessage(text);
-        }
+        try { await conversation.sendMessage({ text }); } catch (e) { await conversation.sendMessage(text); }
       } else if (conversation && typeof conversation.send === 'function') {
         await conversation.send(text);
       } else if (conversation && typeof conversation.createMessage === 'function') {
@@ -239,87 +252,6 @@ export function VoiceAgentProvider({ children, onTabChange }) {
     } catch (err) {
       console.error("Failed to send message:", err);
       setAgentStatus('listening');
-    }
-  };
-
-  // Start speech recognition
-  const startListening = () => {
-    if (recognitionRef.current) return;
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.error("Speech recognition not supported");
-      return;
-    }
-
-    const recog = new SpeechRecognition();
-    recog.lang = "en-US";
-    recog.interimResults = false;
-    recog.continuous = true;
-
-    recog.onstart = () => {
-      console.log("Speech recognition STARTED");
-      setAgentStatus("listening");
-    };
-
-    recog.onresult = (ev) => {
-      const transcript = Array.from(ev.results)
-        .slice(ev.resultIndex)
-        .map((r) => r[0].transcript)
-        .join(' ');
-
-      console.log("Transcribed:", transcript);
-      // Ignore transcriptions captured while the agent is speaking (avoid echoing TTS)
-      if (speakingRef.current) {
-        console.log('Ignored transcript while agent speaking');
-        return;
-      }
-
-      if (transcript.trim()) sendTranscript(transcript);
-    };
-
-    recog.onerror = (err) => {
-      if (err.error === "not-allowed") {
-        console.error("Microphone permission denied");
-        recognitionRef.current = null;
-        return;
-      }
-      if (err.error === 'no-speech' || err.error === 'audio-capture' || err.error === 'aborted') {
-        return;
-      }
-      console.error("SpeechRecognition error:", err);
-    };
-
-    recog.onend = () => {
-      console.log("Speech recognition ended - restarting");
-      setTimeout(() => {
-        if (recognitionRef.current === recog && agentStatus !== "idle") {
-          try {
-            recog.start();
-          } catch (e) {
-            if (!e.message.includes('already started')) {
-              console.log("Could not restart:", e.message);
-            }
-          }
-        }
-      }, 500);
-    };
-
-    recognitionRef.current = recog;
-    try {
-      recog.start();
-    } catch (e) {
-      console.error("Failed to start recognition", e);
-      recognitionRef.current = null;
-    }
-  };
-
-  // Stop speech recognition
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
-      setAgentStatus("idle");
     }
   };
 
@@ -362,10 +294,6 @@ export function VoiceAgentProvider({ children, onTabChange }) {
         if (conversation?.status === "disconnected") {
           console.log("🚀 Auto-starting ElevenLabs session...");
           await conversation.startSession({ agentId });
-          // Auto-start microphone after session connects
-          setTimeout(() => {
-            startListening();
-          }, 1000);
         }
       } catch (err) {
         console.error("Failed to start session:", err);

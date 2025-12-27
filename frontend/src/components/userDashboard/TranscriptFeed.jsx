@@ -53,7 +53,7 @@ export function TranscriptFeed({ isCollapsed = false, onToggleCollapse }) {
   }
 
   return (
-    <Card as={motion.div} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="h-100 d-flex flex-column">
+    <Card as={motion.div} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="h-100 d-flex flex-column border border-primary">
       <Card.Header className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center gap-2">
           <h5 className="mb-0">Conversation</h5>
