@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, User, Bell, HelpCircle, LogOut, Menu, X } from 'lucide-react';
 import { Button, Nav } from 'react-bootstrap';
 import { VoiceControl } from './VoiceControl';
+import { MiniVoiceBar } from './MiniVoiceBar';
 import { TranscriptFeed } from './TranscriptFeed';
 import { ActionStrip } from './ActionStrip';
 import { ProgressTracker } from './ProgressTracker';
@@ -11,6 +12,7 @@ import { ProjectPlanner } from './ProjectPlanner';
 import { SettingsPanel } from './SettingsPanel';
 import { QuickActionsGuide } from './QuickActionsGuide';
 import { useUser } from '../../contexts/userContext';
+import { VoiceAgentProvider } from '../../contexts/VoiceAgentContext';
 
 export default function UserDashboard() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -36,7 +38,8 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-vh-100" style={{ backgroundColor: '#f7fafc' }}>
+    <VoiceAgentProvider onTabChange={setActiveTab}>
+      <div className="min-vh-100" style={{ backgroundColor: '#f7fafc', paddingBottom: activeTab !== 'learn' ? '100px' : '0' }}>
       {/* Top Status Bar - Fixed */}
       <header className="position-fixed top-0 start-0 end-0 bg-white border-bottom shadow-sm" style={{ zIndex: 1040 }}>
         <div className="container-fluid px-3 px-md-4">
@@ -329,8 +332,14 @@ export default function UserDashboard() {
         )}
       </AnimatePresence>
 
+      {/* Mini Voice Bar - Show in all tabs except 'learn' */}
+      <AnimatePresence>
+        {activeTab !== 'learn' && <MiniVoiceBar />}
+      </AnimatePresence>
+
       {/* Screen reader live region for global announcements */}
       <div id="global-announcements" className="visually-hidden" role="status" aria-live="polite" aria-atomic="true" />
-    </div>
+      </div>
+    </VoiceAgentProvider>
   );
 }
