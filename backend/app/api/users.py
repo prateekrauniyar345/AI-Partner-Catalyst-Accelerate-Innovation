@@ -10,7 +10,7 @@ users_blp = Blueprint("users", __name__, url_prefix="/users", description="User 
 @users_blp.route("/", methods=["GET"])
 @users_blp.response(200, UserSchema(many=True))
 def list_users():
-    return [{"id": 1, "name": "Alice"}]
+    return [{"id": 1, "first_name": "Alice"}]
 
 @users_blp.route("/", methods=["POST"])
 @users_blp.arguments(CreateUserSchema)

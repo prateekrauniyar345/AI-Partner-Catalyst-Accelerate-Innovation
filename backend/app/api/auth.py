@@ -14,7 +14,7 @@ from ..schemas.auth import (
 
 from ..auth.supabase_client import supabase_client
 from functools import wraps
-from ..models.users import UserSchema
+from ..schemas.users import UserSchema
 
 
 auth_blp = SmorestBlueprint(
