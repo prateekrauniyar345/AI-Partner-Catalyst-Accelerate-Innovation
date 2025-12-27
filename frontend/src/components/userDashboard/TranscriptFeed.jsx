@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Card } from 'react-bootstrap';
 import { useVoiceAgent } from '../../contexts/VoiceAgentContext';
+import { StreamingText } from './StreamingText';
 
 export function TranscriptFeed({ isCollapsed = false, onToggleCollapse }) {
   const { messages, clearMessages } = useVoiceAgent();
@@ -40,6 +41,9 @@ export function TranscriptFeed({ isCollapsed = false, onToggleCollapse }) {
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
+  
+  const lastAiIndex = messages.map(m => isUserMessage(m)).lastIndexOf(false);
+
 
   if (isCollapsed) {
     return (
@@ -65,7 +69,7 @@ export function TranscriptFeed({ isCollapsed = false, onToggleCollapse }) {
       <Card.Body ref={scrollAreaRef} style={{ overflowY: 'auto', flex: 1 }}>
         <div role="log" aria-live="polite" aria-label="Conversation history">
           <AnimatePresence>
-            {messages.map((message) => {
+            {messages.map((message, index) => {
               const isUser = isUserMessage(message);
               return (
                 <motion.div
@@ -95,7 +99,11 @@ export function TranscriptFeed({ isCollapsed = false, onToggleCollapse }) {
 
                   <div className="w-100" style={{ maxWidth: '80%' }}>
                     <div className={`rounded-3 p-3 position-relative ${isUser ? 'bg-primary text-white' : 'bg-light text-dark'}`}>
-                      <p className="mb-1 small" style={{ lineHeight: 1.4 }}>{message.content}</p>
+                      {isUser ? (
+                        <p className="mb-1 small" style={{ lineHeight: 1.4 }}>{message.content}</p>
+                      ) : (
+                        <StreamingText fullText={message.content} animate={index === lastAiIndex} />
+                      )}
                       {currentlySpeaking === message.id && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="position-absolute top-0 end-0 m-1 badge bg-success">
                           <span>Playing</span>
