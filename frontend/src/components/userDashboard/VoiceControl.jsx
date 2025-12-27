@@ -1,5 +1,4 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Square } from "lucide-react";
 import { useVoiceAgent } from "../../contexts/VoiceAgentContext";
 
 export function VoiceControl() {
@@ -10,13 +9,13 @@ export function VoiceControl() {
   const getStatusConfig = () => {
     switch (agentStatus) {
       case 'listening':
-        return { label: "👂 Listening...", pulseColor: "rgba(112, 19, 198, 0.4)", waveColor: "#7013c6" };
+        return { label: "Listening...", pulseColor: "rgba(112, 19, 198, 0.4)", waveColor: "#7013c6" };
       case 'processing':
-        return { label: "🧠 Thinking...", pulseColor: "rgba(99, 102, 241, 0.4)", waveColor: "#6366f1" };
+        return { label: "Thinking...", pulseColor: "rgba(99, 102, 241, 0.4)", waveColor: "#6366f1" };
       case 'speaking':
-        return { label: "🔊 Speaking...", pulseColor: "rgba(236, 72, 153, 0.4)", waveColor: "#ec4899" };
+        return { label: "Speaking...", pulseColor: "rgba(236, 72, 153, 0.4)", waveColor: "#ec4899" };
       default:
-        return { label: "🎤 Ready", pulseColor: "rgba(139, 92, 246, 0.3)", waveColor: "#8b5cf6" };
+        return { label: "Ready", pulseColor: "rgba(139, 92, 246, 0.3)", waveColor: "#8b5cf6" };
     }
   };
 
@@ -154,7 +153,7 @@ export function VoiceControl() {
             agentStatus === 'idle' ? 'Voice assistant ready' :
             agentStatus === 'listening' ? 'Listening to your voice' :
             agentStatus === 'processing' ? 'Processing your request' :
-            'Click to stop speaking'
+            'Stop speaking'
           }
         >
           {agentStatus === 'processing' ? (
@@ -169,10 +168,8 @@ export function VoiceControl() {
                 borderTopColor: '#fff',
               }}
             />
-          ) : agentStatus === 'speaking' ? (
-            <Square size={70} fill="white" color="white" />
           ) : (
-            <Mic size={70} strokeWidth={2} />
+            <div style={{ width: 70, height: 70 }} />
           )}
         </motion.button>
       </div>

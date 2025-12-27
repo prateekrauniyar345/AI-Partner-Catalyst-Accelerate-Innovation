@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Mic, Volume2, Square } from 'lucide-react';
 import { useVoiceAgent } from '../../contexts/VoiceAgentContext';
 
 export function MiniVoiceBar() {
@@ -7,10 +6,10 @@ export function MiniVoiceBar() {
 
   const getStatusText = () => {
     switch (agentStatus) {
-      case 'listening': return '👂 Listening...';
-      case 'processing': return '🤔 Thinking...';
-      case 'speaking': return '🗣️ Speaking...';
-      default: return '💤 Idle';
+      case 'listening': return 'Listening...';
+      case 'processing': return 'Thinking...';
+      case 'speaking': return 'Speaking...';
+      default: return 'Idle';
     }
   };
 
@@ -24,54 +23,67 @@ export function MiniVoiceBar() {
   };
 
   return (
-    <motion.div
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: 100, opacity: 0 }}
-      style={{
-        position: 'fixed',
-        bottom: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 'calc(100% - 40px)',
-        maxWidth: '800px',
-        height: '70px',
-        background: 'linear-gradient(135deg, #7013c6 0%, #ec4899 100%)',
-        borderRadius: '35px',
-        boxShadow: '0 8px 32px rgba(112, 19, 198, 0.4)',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 1.5rem',
-        color: 'white',
-        backdropFilter: 'blur(10px)',
-      }}
-    >
+    <div style={{
+      position: 'fixed',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      pointerEvents: 'none',
+      padding: '20px 12px',
+      zIndex: 1200,
+    }}>
+      <motion.div
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 40, opacity: 0 }}
+        style={{
+          pointerEvents: 'auto',
+          width: 'min(900px, calc(100% - 80px))',
+          maxWidth: '900px',
+          height: '70px',
+          background: 'linear-gradient(135deg, #7013c6 0%, #ec4899 100%)',
+          borderRadius: '35px',
+          boxShadow: '0 8px 32px rgba(112, 19, 198, 0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 1.5rem',
+          color: 'white',
+          backdropFilter: 'blur(10px)',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}
+      >
       {/* Left: Status and Icon */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <motion.div
           animate={{
-            scale: agentStatus === 'speaking' ? [1, 1.2, 1] : 1,
+            scale: agentStatus === 'speaking' ? [1, 1.15, 1] : 1,
           }}
           transition={{
-            duration: 0.8,
+            duration: 0.9,
             repeat: agentStatus === 'speaking' ? Infinity : 0,
           }}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
         >
-          {agentStatus === 'speaking' ? (
-            <Volume2 size={32} color={getStatusColor()} />
-          ) : (
-            <Mic size={32} color={getStatusColor()} />
-          )}
-        </motion.div>
+          <div style={{
+            width: 14,
+            height: 14,
+            borderRadius: 7,
+            background: getStatusColor(),
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }} />
 
-        <div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>VoiceEd Ally</div>
-          <div style={{ fontSize: '1.1rem', fontWeight: '600' }}>
-            {getStatusText()}
+          <div>
+            <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>VoiceEd Ally</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: '600' }}>
+              {getStatusText()}
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Center: Waveform */}
@@ -112,25 +124,31 @@ export function MiniVoiceBar() {
         <motion.button
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
           onClick={stopAgentSpeaking}
           style={{
-            background: 'rgba(255,255,255,0.25)',
-            border: '2px solid rgba(255,255,255,0.6)',
-            borderRadius: '50%',
-            width: '45px',
-            height: '45px',
+            background: 'rgba(255,255,255,0.18)',
+            border: '1px solid rgba(255,255,255,0.5)',
+            borderRadius: '12px',
+            width: '56px',
+            height: '36px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            transition: 'all 0.2s',
+            transition: 'all 0.15s',
           }}
         >
-          <Square size={18} fill="white" color="white" />
+          <div style={{
+            width: 12,
+            height: 12,
+            background: 'white',
+            borderRadius: 2,
+          }} />
         </motion.button>
       )}
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

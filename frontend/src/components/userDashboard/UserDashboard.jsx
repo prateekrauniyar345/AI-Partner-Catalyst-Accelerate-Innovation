@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, User, Bell, HelpCircle, LogOut, Menu, X } from 'lucide-react';
 import { Button, Nav } from 'react-bootstrap';
 import { VoiceControl } from './VoiceControl';
 import { MiniVoiceBar } from './MiniVoiceBar';
@@ -51,9 +50,9 @@ export default function UserDashboard() {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="d-lg-none p-2 rounded-3"
                 aria-label="Toggle menu"
-                style={{ width: 40, height: 40 }}
+                style={{ width: 40, height: 40, fontSize: 13 }}
               >
-                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                {isMobileMenuOpen ? 'Close' : 'Menu'}
               </Button>
 
               <div className="d-flex align-items-center gap-3">
@@ -64,9 +63,11 @@ export default function UserDashboard() {
                     height: 48,
                     background: '#e9ecef',
                     boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                    color: '#111827',
+                    fontWeight: 600,
                   }}
                 >
-                  <User className="text-dark" size={24} />
+                  {displayName ? displayName.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase() : 'UE'}
                 </div>
                 <div className="d-none d-sm-block">
                   <h2 className="h6 mb-1 fw-semibold">Welcome back, {displayName || 'there'}!</h2>
@@ -77,23 +78,23 @@ export default function UserDashboard() {
 
             {/* Right: Actions */}
             <div className="d-flex align-items-center gap-2 gap-md-3">
-              <Button variant="light" className="rounded-3 position-relative p-0" aria-label="Notifications" title="Notifications" style={{ width: 45, height: 45 }}>
-                <Bell size={20} className="text-primary" />
+              <Button variant="light" className="rounded-3 position-relative p-1" aria-label="Notifications" title="Notifications" style={{ minWidth: 90, height: 36, fontSize: 13 }}>
+                Notifications
                 <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" />
               </Button>
 
-              <Button variant="light" className="rounded-3 p-0" aria-label="Help" title="Help" style={{ width: 45, height: 45 }}>
-                <HelpCircle size={20} className="text-info" />
+              <Button variant="light" className="rounded-3 p-1" aria-label="Help" title="Help" style={{ minWidth: 60, height: 36, fontSize: 13 }}>
+                Help
               </Button>
 
-              <Button variant="light" className="rounded-3 p-0" onClick={() => setIsSettingsOpen(true)} aria-label="Settings" title="Settings" style={{ width: 45, height: 45 }}>
-                <Settings size={20} className="text-primary" />
+              <Button variant="light" className="rounded-3 p-1" onClick={() => setIsSettingsOpen(true)} aria-label="Settings" title="Settings" style={{ minWidth: 80, height: 36, fontSize: 13 }}>
+                Settings
               </Button>
 
               <div className="vr d-none d-md-block" />
 
-              <Button variant="light" className="rounded-3 p-0" aria-label="Sign out" title="Sign out" style={{ width: 45, height: 45 }}>
-                <LogOut size={20} className="text-danger" />
+              <Button variant="light" className="rounded-3 p-1" aria-label="Sign out" title="Sign out" style={{ minWidth: 80, height: 36, fontSize: 13 }}>
+                Sign out
               </Button>
             </div>
           </div>
@@ -333,9 +334,12 @@ export default function UserDashboard() {
       </AnimatePresence>
 
       {/* Mini Voice Bar - Show in all tabs except 'learn' */}
-      <AnimatePresence>
-        {activeTab !== 'learn' && <MiniVoiceBar />}
-      </AnimatePresence>
+      <div className='w-100 d-flex justify-content-center align-items-center border-border-primary'>
+         <AnimatePresence>
+          {activeTab !== 'learn' && <MiniVoiceBar />}
+        </AnimatePresence>
+      </div>
+     
 
       {/* Screen reader live region for global announcements */}
       <div id="global-announcements" className="visually-hidden" role="status" aria-live="polite" aria-atomic="true" />
