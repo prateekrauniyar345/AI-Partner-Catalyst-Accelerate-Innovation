@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useVoiceAgent } from "../../contexts/VoiceAgentContext";
 
 export function VoiceControl() {
-  const { agentStatus, waveform, stopAgentSpeaking, conversation } = useVoiceAgent();
+  const { agentStatus, waveform, stopAgentSpeaking, conversation, closeConversation, establishConversation } = useVoiceAgent();
 
   const agentId = import.meta.env.VITE_ELEVENLABS_AGENT_ID;
 
@@ -179,6 +179,18 @@ export function VoiceControl() {
         <small className={`badge ${conversation?.status === 'connected' ? 'bg-success' : 'bg-secondary'}`}>
           {conversation?.status === 'connected' ? '✓ Connected' : '○ Connecting...'}
         </small>
+      </div>
+
+
+      <div className="container gap-4 w-75 d-flex justify-content-center">
+      {/* button to establish the connection */}
+        <button onClick={establishConversation} className="btn btn-primary mt-3">
+          Connect
+        </button> 
+        {/* button to disconnect the connection */}
+        <button onClick={closeConversation} className="btn btn-danger mt-3">
+          Disconnect
+        </button>
       </div>
 
       {/* Accessibility Announcements */}

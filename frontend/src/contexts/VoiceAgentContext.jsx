@@ -82,7 +82,7 @@ export function VoiceAgentProvider({ children, onTabChange }) {
       },
     },
     onConnect: () => {
-      console.log("✅ Connected to ElevenLabs!");
+      console.log("Connected to ElevenLabs!");
       setAgentStatus('listening');
     },
     onDisconnect: (info) => {
@@ -148,7 +148,7 @@ export function VoiceAgentProvider({ children, onTabChange }) {
   const sendTranscript = async (text) => {
     if (!text.trim() || !conversation) return;
     
-    console.log("📤 Sending to agent:", text);
+    console.log("Sending to agent:", text);
     setAgentStatus('processing');
     setTranscript(text);
     
@@ -224,7 +224,7 @@ export function VoiceAgentProvider({ children, onTabChange }) {
     recog.continuous = true;
 
     recog.onstart = () => {
-      console.log("✅ Speech recognition STARTED");
+      console.log("Speech recognition STARTED");
       setAgentStatus("listening");
     };
 
@@ -234,7 +234,7 @@ export function VoiceAgentProvider({ children, onTabChange }) {
         .map((r) => r[0].transcript)
         .join('');
         
-      console.log("🎤 Transcribed:", transcript);
+      console.log("Transcribed:", transcript);
       if (transcript.trim()) sendTranscript(transcript);
     };
 
@@ -288,6 +288,25 @@ export function VoiceAgentProvider({ children, onTabChange }) {
     if (conversation?.stopPlaying) {
       conversation.stopPlaying();
       setAgentStatus("listening");
+    }
+  };
+
+  const closeConversation = () => {
+    if (conversation?.endSession) {
+      conversation.endSession().catch(() => {});
+    }
+    stopListening();
+    setAgentStatus('idle');
+  }
+
+  const establishConversation = async () => {
+    if (conversation?.status === 'disconnected') {
+      try {
+        await conversation.startSession({ agentId });
+        console.log("Conversation session established Manually");
+      } catch (err) {
+        console.error("Failed to establish session:", err);
+      }
     }
   };
 
@@ -350,6 +369,8 @@ export function VoiceAgentProvider({ children, onTabChange }) {
     stopAgentSpeaking,
     sendTranscript,
     clearMessages: () => setMessages([]),
+    closeConversation,
+    establishConversation,
   };
 
   return (
