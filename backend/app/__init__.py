@@ -97,10 +97,12 @@ def create_app(config_class=Config):
     from app.api.default import default_blp
     from .api.logs import logs_blp
     from app.api.canvas import canvas_blp
+    from .api.projects import projects_blp
     api.register_blueprint(users_blp)
     api.register_blueprint(auth_blp)
     api.register_blueprint(default_blp)
     api.register_blueprint(logs_blp)
     api.register_blueprint(canvas_blp)
+    api.register_blueprint(projects_blp)
 
     return app

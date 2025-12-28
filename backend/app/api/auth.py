@@ -378,3 +378,35 @@ def me():
         "last_name": meta.get("last_name"),
         "username": meta.get("username"),
     }
+
+
+
+
+
+# -------------------------------------
+# Get current user ID utility
+# -------------------------------------
+def get_current_user_id():
+    """
+    Extract the authenticated user's id from request.current_user
+    (which is set by require_auth).
+    """
+    user = getattr(request, "current_user", None)
+    if not user:
+        abort(401, message="Authentication required")
+
+    # Supabase user object is usually pydantic-like
+    if hasattr(user, "id") and user.id:
+        return user.id
+
+    # Or it might be dict-like
+    if isinstance(user, dict) and user.get("id"):
+        return user["id"]
+
+    # Or it might have model_dump()
+    if hasattr(user, "model_dump"):
+        u = user.model_dump()
+        if u.get("id"):
+            return u["id"]
+
+    abort(401, message="Could not resolve user id")
