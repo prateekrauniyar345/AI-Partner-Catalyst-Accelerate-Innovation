@@ -24,6 +24,53 @@ export default function UserDashboard() {
   const [speed, setSpeed] = useState(1.0);
   const [volume, setVolume] = useState(80);
 
+  // Lifted state for SettingsPanel (controlled by both UI and voice commands)
+  const [voiceProfile, setVoiceProfile] = useState('emily');
+  const [voiceSpeed, setVoiceSpeed] = useState(1.0);
+  const [voicePitch, setVoicePitch] = useState(1.0);
+  const [verbosity, setVerbosity] = useState('normal');
+  const [supportiveMode, setSupportiveMode] = useState(true);
+  const [highContrast, setHighContrast] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [privateMode, setPrivateMode] = useState(false);
+
+  // Handler for voice agent to change settings
+  const handleSettingChange = (setting_id, value) => {
+    console.log(`Setting change via voice: ${setting_id} = ${value}`);
+    
+    switch (setting_id) {
+      case 'isSettingsOpen':
+        setIsSettingsOpen(value);
+        break;
+      case 'voiceProfile':
+        setVoiceProfile(value);
+        break;
+      case 'voiceSpeed':
+        setVoiceSpeed(Number(value));
+        break;
+      case 'voicePitch':
+        setVoicePitch(Number(value));
+        break;
+      case 'verbosity':
+        setVerbosity(value);
+        break;
+      case 'supportiveMode':
+        setSupportiveMode(value);
+        break;
+      case 'highContrast':
+        setHighContrast(value);
+        break;
+      case 'reduceMotion':
+        setReduceMotion(value);
+        break;
+      case 'privateMode':
+        setPrivateMode(value);
+        break;
+      default:
+        console.warn(`Unknown setting: ${setting_id}`);
+    }
+  };
+
   const { user } = useUser();
   const displayName = user?.name || user?.full_name || (user?.email ? user.email.split('@')[0] : '');
   const userEmail = user?.email || '';
@@ -48,6 +95,7 @@ export default function UserDashboard() {
       onTabChange={setActiveTab}
       onSpeedChange={setSpeed}
       onVolumeChange={setVolume}
+      onSettingChange={handleSettingChange}
     >
       <div className="min-vh-100" style={{ backgroundColor: '#f7fafc', paddingBottom: activeTab !== 'Voice Learning' ? '100px' : '0' }}>
       {/* Top Status Bar - Fixed */}
@@ -351,7 +399,26 @@ export default function UserDashboard() {
       {/* Settings Panel */}
       <AnimatePresence>
         {isSettingsOpen && (
-          <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+          <SettingsPanel 
+            isOpen={isSettingsOpen} 
+            onClose={() => setIsSettingsOpen(false)}
+            voiceProfile={voiceProfile}
+            setVoiceProfile={setVoiceProfile}
+            voiceSpeed={voiceSpeed}
+            setVoiceSpeed={setVoiceSpeed}
+            voicePitch={voicePitch}
+            setVoicePitch={setVoicePitch}
+            verbosity={verbosity}
+            setVerbosity={setVerbosity}
+            supportiveMode={supportiveMode}
+            setSupportiveMode={setSupportiveMode}
+            highContrast={highContrast}
+            setHighContrast={setHighContrast}
+            reduceMotion={reduceMotion}
+            setReduceMotion={setReduceMotion}
+            privateMode={privateMode}
+            setPrivateMode={setPrivateMode}
+          />
         )}
       </AnimatePresence>
 

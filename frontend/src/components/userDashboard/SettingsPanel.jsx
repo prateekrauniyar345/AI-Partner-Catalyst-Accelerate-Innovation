@@ -3,14 +3,26 @@ import { motion } from 'framer-motion';
 import { Settings, Volume2, MessageSquare, Eye, Lock, X } from 'lucide-react';
 import { Modal, Button, Form, Card } from 'react-bootstrap';
 
-export function SettingsPanel({ isOpen, onClose }) {
-  const [voiceSpeed, setVoiceSpeed] = useState(1.0);
-  const [voicePitch, setVoicePitch] = useState(1.0);
-  const [verbosity, setVerbosity] = useState('normal');
-  const [supportiveMode, setSupportiveMode] = useState(true);
-  const [highContrast, setHighContrast] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [privateMode, setPrivateMode] = useState(false);
+export function SettingsPanel({ 
+  isOpen, 
+  onClose,
+  voiceProfile = 'emily',
+  setVoiceProfile,
+  voiceSpeed = 1.0,
+  setVoiceSpeed,
+  voicePitch = 1.0,
+  setVoicePitch,
+  verbosity = 'normal',
+  setVerbosity,
+  supportiveMode = true,
+  setSupportiveMode,
+  highContrast = false,
+  setHighContrast,
+  reduceMotion = false,
+  setReduceMotion,
+  privateMode = false,
+  setPrivateMode
+}) {
 
   const announceChange = (setting, value) => {
     const announcement = document.createElement('div');
@@ -42,7 +54,14 @@ export function SettingsPanel({ isOpen, onClose }) {
           <Card.Body>
             <Form.Group className="mb-3">
               <Form.Label htmlFor="voice-select">Voice</Form.Label>
-              <Form.Select id="voice-select" defaultValue="emily">
+              <Form.Select 
+                id="voice-select" 
+                value={voiceProfile} 
+                onChange={e => { 
+                  setVoiceProfile(e.target.value); 
+                  announceChange('Voice', e.target.value); 
+                }}
+              >
                 <option value="emily">Emily (Female, Calm)</option>
                 <option value="michael">Michael (Male, Energetic)</option>
                 <option value="sophia">Sophia (Female, Warm)</option>
