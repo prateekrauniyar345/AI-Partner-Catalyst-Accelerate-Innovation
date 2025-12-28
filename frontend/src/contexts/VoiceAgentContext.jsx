@@ -177,15 +177,11 @@ export function VoiceAgentProvider({ children, onTabChange }) {
       navigate_tab: async ({ tab_name }) => {
         console.log("Agent navigating to tab:", tab_name);
         const tabMap = {
-          'learn': 'learn',
-          'voice': 'learn',
-          'lesson': 'learn',
-          'progress': 'progress',
-          'my progress': 'progress',
-          'lesson plan': 'lessons',
-          'lessons': 'lessons',
-          'project': 'projects',
-          'projects': 'projects',
+          'Voice Learning' : "Voice Learning",
+          'My Progress': "My Progress",
+          'Lesson Plan': "Lesson Plan",
+          'My Courses': "My Courses",
+          'Projects': "Projects",
         };
         const targetTab = tabMap[tab_name.toLowerCase()] || 'learn';
         if (onTabChange) {

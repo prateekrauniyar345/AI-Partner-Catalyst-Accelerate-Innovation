@@ -18,7 +18,7 @@ export default function UserDashboard() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTranscriptCollapsed, setIsTranscriptCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('voice_learning');
+  const [activeTab, setActiveTab] = useState('Voice Learning');
 
   const { user } = useUser();
   const displayName = user?.name || user?.full_name || (user?.email ? user.email.split('@')[0] : '');
@@ -31,16 +31,16 @@ export default function UserDashboard() {
 
   // current navigation system
   const navOptions = {
-    "voice_learning": "Voice Learning",
-    "my_progress": "My Progress",
-    "lesson_plans": "Lesson Plans",
-    "my_courese" : "My Courses",
-    "projects": "Projects",
+    "Voice Learning": "Voice Learning",
+    "My Progress": "My Progress",
+    "Lesson Plans": "Lesson Plans",
+    "My Courses" : "My Courses",
+    "Projects": "Projects",
   }
 
   return (
     <VoiceAgentProvider onTabChange={setActiveTab}>
-      <div className="min-vh-100" style={{ backgroundColor: '#f7fafc', paddingBottom: activeTab !== 'voice_learning' ? '100px' : '0' }}>
+      <div className="min-vh-100" style={{ backgroundColor: '#f7fafc', paddingBottom: activeTab !== 'Voice Learning' ? '100px' : '0' }}>
       {/* Top Status Bar - Fixed */}
       <header className="position-fixed top-0 start-0 end-0 bg-white border-bottom shadow-sm" style={{ zIndex: 1040 }}>
         <div className="container-fluid px-3 px-md-4">
@@ -114,11 +114,11 @@ export default function UserDashboard() {
               <Nav variant="pills" activeKey={activeTab} onSelect={handleTabSelect} className="flex-column p-3">
                 <Nav.Item>
                   <Nav.Link
-                    eventKey="voice_learning"
+                    eventKey="Voice Learning"
                     style={{
-                      backgroundColor: activeTab === 'voice_learning' ? '#f3f4f6' : 'transparent',
+                      backgroundColor: activeTab === 'Voice Learning' ? '#f3f4f6' : 'transparent',
                       color: '#000',
-                      fontWeight: activeTab === 'voice_learning' ? 700 : 500,
+                      fontWeight: activeTab === 'Voice Learning' ? 700 : 500,
                       borderRadius: 8,
                       padding: '8px 12px',
                       marginBottom: 8,
@@ -129,11 +129,11 @@ export default function UserDashboard() {
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link
-                    eventKey="my_progress"
+                    eventKey="My Progress"
                     style={{
-                      backgroundColor: activeTab === 'my_progress' ? '#f3f4f6' : 'transparent',
+                      backgroundColor: activeTab === 'My Progress' ? '#f3f4f6' : 'transparent',
                       color: '#000',
-                      fontWeight: activeTab === 'my_progress' ? 700 : 500,
+                      fontWeight: activeTab === 'My Progress' ? 700 : 500,
                       borderRadius: 8,
                       padding: '8px 12px',
                       marginBottom: 8,
@@ -144,11 +144,11 @@ export default function UserDashboard() {
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link
-                    eventKey="lesson_plans"
+                    eventKey="Lesson Plans"
                     style={{
-                      backgroundColor: activeTab === 'lesson_plans' ? '#f3f4f6' : 'transparent',
+                      backgroundColor: activeTab === 'Lesson Plans' ? '#f3f4f6' : 'transparent',
                       color: '#000',
-                      fontWeight: activeTab === 'lesson_plans' ? 700 : 500,
+                      fontWeight: activeTab === 'Lesson Plans' ? 700 : 500,
                       borderRadius: 8,
                       padding: '8px 12px',
                       marginBottom: 8,
@@ -159,11 +159,11 @@ export default function UserDashboard() {
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link
-                    eventKey="projects"
+                    eventKey="Projects"
                     style={{
-                      backgroundColor: activeTab === 'projects' ? '#f3f4f6' : 'transparent',
+                      backgroundColor: activeTab === 'Projects' ? '#f3f4f6' : 'transparent',
                       color: '#000',
-                      fontWeight: activeTab === 'projects' ? 700 : 500,
+                      fontWeight: activeTab === 'Projects' ? 700 : 500,
                       borderRadius: 8,
                       padding: '8px 12px',
                       marginBottom: 8,
@@ -198,7 +198,7 @@ export default function UserDashboard() {
             </div>
 
             <div className="mt-3">
-              {activeTab === 'voice_learning' && (
+              {activeTab === 'Voice Learning' && (
                 <div className="row g-3">
                   <div className="col-lg-8">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-3 shadow-sm p-4 border">
@@ -216,19 +216,19 @@ export default function UserDashboard() {
                 </div>
               )}
 
-              {activeTab === 'my_progress' && (
+              {activeTab === 'My Progress' && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                   <ProgressTracker />
                 </motion.div>
               )}
 
-              {activeTab === 'my_courese' && (
+              {activeTab === 'My Courses' && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                   <UserCanvasCourses />
                 </motion.div>
               )}
 
-              {activeTab === 'lesson_plans' && (
+              {activeTab === 'Lesson Plans' && (
                 <div className="row g-3">
                   <div className="col-lg-6">
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
@@ -244,7 +244,7 @@ export default function UserDashboard() {
                 </div>
               )}
 
-              {activeTab === 'projects' && (
+              {activeTab === 'Projects' && (
                 <div className="row g-3">
                   <div className="col-lg-8">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -260,7 +260,7 @@ export default function UserDashboard() {
                       <div className="bg-white rounded border p-3 text-center">
                         <div className="display-4 mb-2">🏆</div>
                         <h3 className="fw-semibold mb-2">Keep Going!</h3>
-                        <p className="small text-muted">You're making great progress on your projects. Stay focused and you'll achieve your goals!</p>
+                        <p className="small text-muted">You're making great progress on your Projects. Stay focused and you'll achieve your goals!</p>
                       </div>
                     </motion.div>
                   </div>
@@ -271,7 +271,7 @@ export default function UserDashboard() {
 
           {/* Content for mobile view (driven by the same state) */}
           <div className="d-lg-none mt-3">
-            {activeTab === 'voice_learning' && (
+            {activeTab === 'Voice Learning' && (
               <div className="row g-3">
               <div className="col-lg-8">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-3 shadow-sm p-4 border">
@@ -288,17 +288,17 @@ export default function UserDashboard() {
               </div>
             </div>
             )}
-            {activeTab === 'my_progress' && (
+            {activeTab === 'My Progress' && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <ProgressTracker />
               </motion.div>
             )}
-            {activeTab === 'my_courese' && (
+            {activeTab === 'My Courses' && (
               <div>
                 <UserCanvasCourses />
               </div>
             )}
-            {activeTab === 'lesson_plans' && (
+            {activeTab === 'Lesson Plans' && (
                <div className="row g-3">
                <div className="col-lg-6">
                  <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
@@ -313,7 +313,7 @@ export default function UserDashboard() {
                </div>
              </div>
             )}
-            {activeTab === 'projects' && (
+            {activeTab === 'Projects' && (
               <div className="row g-3">
               <div className="col-lg-8">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -329,7 +329,7 @@ export default function UserDashboard() {
                   <div className="bg-white rounded border p-3 text-center">
                     <div className="display-4 mb-2">🏆</div>
                     <h3 className="fw-semibold mb-2">Keep Going!</h3>
-                    <p className="small text-muted">You're making great progress on your projects. Stay focused and you'll achieve your goals!</p>
+                    <p className="small text-muted">You're making great progress on your Projects. Stay focused and you'll achieve your goals!</p>
                   </div>
                 </motion.div>
               </div>
@@ -349,7 +349,7 @@ export default function UserDashboard() {
       {/* Mini Voice Bar - Show in all tabs except 'learn' */}
       <div className='w-100 d-flex justify-content-center align-items-center border-border-primary'>
          <AnimatePresence>
-          {activeTab !== 'voice_learning' && <MiniVoiceBar />}
+          {activeTab !== 'Voice Learning' && <MiniVoiceBar />}
         </AnimatePresence>
       </div>
      
