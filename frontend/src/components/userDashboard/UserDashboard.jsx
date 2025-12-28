@@ -393,7 +393,8 @@ export default function UserDashboard() {
                   <VoiceControl />
                 </motion.div>
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-3">
-                  <ActionStrip />
+                  {/* <ActionStrip /> */}
+                  <ActionStrip speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
                 </motion.div>
               </div>
               <div className="col-lg-4">

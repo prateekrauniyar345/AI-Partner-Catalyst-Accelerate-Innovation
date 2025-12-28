@@ -52,7 +52,12 @@ Use this tool for ANY change to the settings modal or user preferences.
 - LOGIC: Increase/decrease by 20. Range: 0-100.
 - EXAMPLE: "Make it louder." -> set_volume(volume_level: 100)
 
-6. manage_projects (Project Lifecycle Management)
+6. set_playback_speed
+- TRIGGER: User requests speed adjustments.
+- LOGIC: Adjust in increments of 0.2x within 0.5x to 2.0x.
+- EXAMPLE: "Speak slower." -> set_playback_speed(speed_value: 0.8)
+
+7. manage_projects (Project Lifecycle Management)
 - TRIGGER: Creating new projects or editing existing ones.
 - ACTIONS:
     A. Create: Use action: "create". In project_data, provide a JSON string with "title", "description", "subject", "dueDate", and "priority".
