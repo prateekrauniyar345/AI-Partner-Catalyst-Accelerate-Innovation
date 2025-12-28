@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import canvasApi from '../../services/canvasApi';
 import { Card, Button, Spinner, Accordion } from 'react-bootstrap';
+import { useUser } from '../../contexts/userContext';
 
 function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizzes, syllabus, isLoading }) {
   return (
@@ -218,60 +219,35 @@ function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizze
 }
 
 export default function UserCanvasCourses() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
-  const [courses, setCourses] = useState([]);
+  // Use cached Canvas data from context
+  const { canvasData } = useUser();
+  const { courses, loading, error: canvasError } = canvasData;
+
   const [expandedCourseId, setExpandedCourseId] = useState(null);
   const [courseDetails, setCourseDetails] = useState({}); // { courseId: { modules, assignments, quizzes } }
   const [loadingCourseId, setLoadingCourseId] = useState(null);
-
-  //   console.log("courses loaded:", courses);  
-  //   state for sylabus
   const [syllabus, setSyllabus] = useState({});
+  const [error, setError] = useState(null);
 
-  useEffect(()=>{
-    async function getCourseSyllabus(){
-        try{
-            for (const course of courses){
-                const syllabusData = await canvasApi.getCourse(course.canvas_course_id);
-                setSyllabus((prev) => ({
-                    ...prev,
-                    [course.canvas_course_id]: syllabusData.syllabus_body || 'No syllabus available',
-                }));
-            }
-        }catch(e){
-            console.error("Error fetching syllabus:", e);
+  // Fetch syllabus for all courses when they're loaded
+  useEffect(() => {
+    if (!courses || courses.length === 0) return;
+
+    async function getCourseSyllabus() {
+      try {
+        for (const course of courses) {
+          const syllabusData = await canvasApi.getCourse(course.canvas_course_id);
+          setSyllabus((prev) => ({
+            ...prev,
+            [course.canvas_course_id]: syllabusData.syllabus_body || 'No syllabus available',
+          }));
         }
+      } catch (e) {
+        console.error("Error fetching syllabus:", e);
+      }
     }
     getCourseSyllabus();
-  }, [ courses ]); 
-
-
-
-  //  console.log("sylabus are : ", syllabus);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        setLoading(true);
-        const info = await canvasApi.getUserInformation();
-        if (!mounted) return;
-        setUser(info);
-        const data = await canvasApi.getCourses();
-        if (!mounted) return;
-        setCourses(data || []);
-      } catch (e) {
-        setError(String(e));
-      } finally {
-        setLoading(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  }, [courses]);
 
   async function expandCourse(course) {
     const courseId = course.id || course.canvas_course_id;
@@ -315,7 +291,7 @@ export default function UserCanvasCourses() {
     <div style={{ maxWidth: '100%' }}>
       <h3 style={{ marginBottom: 24 }}>📚 My Canvas Courses</h3>
 
-      {error && (
+      {(error || canvasError) && (
         <div
           style={{
             padding: 12,
@@ -326,7 +302,7 @@ export default function UserCanvasCourses() {
             border: '1px solid #f5c6cb',
           }}
         >
-          Error: {error}
+          Error: {error || canvasError}
         </div>
       )}
 

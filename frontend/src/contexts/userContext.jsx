@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { me as fetchMeService, refreshToken as refreshTokenService, signout as signoutService } from '../services/authServices'
+import canvasApi from '../services/canvasApi'
 // Use relative API (Vite proxy) by default via `authServices` helpers
 
 const UserContext = createContext(null)
@@ -7,6 +8,13 @@ const UserContext = createContext(null)
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [canvasData, setCanvasData] = useState({
+    user: null,
+    courses: [],
+    loading: false,
+    error: null,
+    lastFetched: null,
+  });
  
   
 
@@ -67,10 +75,53 @@ export function UserProvider({ children }) {
       console.warn('signOut request failed', e)
     }
     setUser(null)
+    setCanvasData({
+      user: null,
+      courses: [],
+      loading: false,
+      error: null,
+      lastFetched: null,
+    })
   }
 
+  // Fetch Canvas data once when user is authenticated
+  async function fetchCanvasData() {
+    if (!user || canvasData.lastFetched) return; // Skip if already fetched or no user
+
+    setCanvasData(prev => ({ ...prev, loading: true, error: null }));
+    
+    try {
+      const [canvasUser, courses] = await Promise.all([
+        canvasApi.getUserInformation(),
+        canvasApi.getCourses(),
+      ]);
+
+      setCanvasData({
+        user: canvasUser,
+        courses: courses || [],
+        loading: false,
+        error: null,
+        lastFetched: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Error fetching Canvas data:', error);
+      setCanvasData(prev => ({
+        ...prev,
+        loading: false,
+        error: String(error),
+      }));
+    }
+  }
+
+  // Trigger Canvas data fetch when user is authenticated
+  useEffect(() => {
+    if (user && !canvasData.lastFetched) {
+      fetchCanvasData();
+    }
+  }, [user]);
+
   return (
-    <UserContext.Provider value={{ user, loading, login, signOut }}>
+    <UserContext.Provider value={{ user, loading, login, signOut, canvasData, fetchCanvasData }}>
       {children}
     </UserContext.Provider>
   )
