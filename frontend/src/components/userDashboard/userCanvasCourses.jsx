@@ -226,8 +226,8 @@ export default function UserCanvasCourses() {
   const [courseDetails, setCourseDetails] = useState({}); // { courseId: { modules, assignments, quizzes } }
   const [loadingCourseId, setLoadingCourseId] = useState(null);
 
-  console.log("courses loaded:", courses);  
-   //   state for sylabus
+  //   console.log("courses loaded:", courses);  
+  //   state for sylabus
   const [syllabus, setSyllabus] = useState({});
 
   useEffect(()=>{
@@ -249,7 +249,7 @@ export default function UserCanvasCourses() {
 
 
 
-  console.log("sylabus are : ", syllabus);
+  //  console.log("sylabus are : ", syllabus);
 
   useEffect(() => {
     let mounted = true;
