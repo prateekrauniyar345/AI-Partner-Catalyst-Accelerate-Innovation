@@ -40,22 +40,38 @@ def create_app(config_class=Config):
         logs_dir = os.path.join(app.root_path, "logs")
         os.makedirs(logs_dir, exist_ok=True)
 
-        # backend/server logs
+        # common formatter
+        formatter = logging.Formatter("%(asctime)s %(name)s %(levelname)s %(message)s")
+
+        # --- Backend file handler ---
         backend_log_path = os.path.join(logs_dir, "backend_logs.txt")
         backend_handler = RotatingFileHandler(
             backend_log_path, maxBytes=2_000_000, backupCount=5, encoding="utf-8"
         )
         backend_handler.setLevel(logging.INFO)
-        formatter = logging.Formatter("%(asctime)s %(name)s %(levelname)s %(message)s")
         backend_handler.setFormatter(formatter)
 
+        # --- Root (console) handler ---
+        console_handler_present = False
         root = logging.getLogger()
+        # avoid duplicate stream handlers when reloading
+        for h in getattr(root, "handlers", []):
+            if isinstance(h, logging.StreamHandler):
+                console_handler_present = True
+                break
+
+        if not console_handler_present:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setLevel(logging.INFO)
+            stream_handler.setFormatter(formatter)
+            root.addHandler(stream_handler)
+
+        # set root level and add backend file handler if not already added
         root.setLevel(logging.INFO)
-        # avoid adding duplicate handlers when reloading
         if not any(getattr(h, "baseFilename", None) == backend_log_path for h in getattr(root, "handlers", [])):
             root.addHandler(backend_handler)
 
-        # frontend logs (incoming from browser) go to a separate file via a dedicated logger
+        # --- Frontend file handler (incoming browser logs) ---
         frontend_log_path = os.path.join(logs_dir, "frontend_logs.txt")
         frontend_handler = RotatingFileHandler(
             frontend_log_path, maxBytes=2_000_000, backupCount=5, encoding="utf-8"
@@ -67,6 +83,8 @@ def create_app(config_class=Config):
         frontend_logger.setLevel(logging.INFO)
         if not any(getattr(h, "baseFilename", None) == frontend_log_path for h in getattr(frontend_logger, "handlers", [])):
             frontend_logger.addHandler(frontend_handler)
+        # allow frontend logger messages to propagate to root (console)
+        frontend_logger.propagate = True
 
 
     api = Api(app)
