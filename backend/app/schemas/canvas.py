@@ -29,15 +29,7 @@ class UserSchema(Schema):
     # Optional: Permissions list returned by the /users/:id endpoint
     permissions = fields.Dict(allow_none=True)
 
-class CourseSchema(Schema):
-    """Represents a Canvas course. Maps Canvas' JSON fields to our schema."""
-    # Canvas returns `id` for the course id; map it to `canvas_course_id` here
-    canvas_course_id = fields.Int(required=True, attribute="id")
-    name = fields.Str(attribute="name")
-    course_code = fields.Str(attribute="course_code")
-    enrollment_term = fields.Str(attribute="enrollment_term")
-    start_at = fields.DateTime(attribute="start_at", allow_none=True)
-    end_at = fields.DateTime(attribute="end_at", allow_none=True)
+
 
 # ----------------------------------
 #  query schemas for course query
@@ -45,6 +37,11 @@ class CourseSchema(Schema):
 class CoursesQuerySchema(Schema):
     canvas_user_id = fields.Str(required=False, metadata={"description": "Canvas user id (optional). If omitted, uses /users/self"})
 
+
+
+# ----------------------------------
+#  module schema
+# ----------------------------------
 class ModuleSchema(Schema):
     """Represents a Canvas module (section)."""
     canvas_module_id = fields.Int(required=True, attribute="id")
@@ -52,15 +49,12 @@ class ModuleSchema(Schema):
     position = fields.Int(attribute="position", allow_none=True)
     unlock_at = fields.DateTime(attribute="unlock_at", allow_none=True)
 
-
-
 # ----------------------------------
 #  query schemas for module query
 # ----------------------------------
 class ModulesQuerySchema(Schema):
     course_id = fields.Int(required=False, metadata={"description": "Optional Canvas course id. If omitted, returns modules for all user courses."})
     canvas_user_id = fields.Str(required=False, metadata={"description": "Optional Canvas user id for listing courses (fallback uses /users/self)."})
-
 
 
 class ModuleItemSchema(Schema):
@@ -71,3 +65,59 @@ class ModuleItemSchema(Schema):
     url = fields.Str(attribute="html_url", allow_none=True)
     content_id = fields.Int(attribute="content_id", allow_none=True)
     position = fields.Int(attribute="position", allow_none=True)
+
+
+
+# ----------------------------------
+# File schmea, assignment schema, quiz schema
+# ----------------------------------
+class FileSchema(Schema):
+    """Represents course materials/files."""
+    canvas_file_id = fields.Int(attribute="id")
+    display_name = fields.Str()
+    url = fields.Str()
+    content_type = fields.Str(attribute="content-type")
+    size = fields.Int()
+    updated_at = fields.DateTime()
+
+class AssignmentSchema(Schema):
+    """Represents course assignments."""
+    canvas_assignment_id = fields.Int(attribute="id")
+    name = fields.Str()
+    description = fields.Str(allow_none=True) # This is the "Content"
+    due_at = fields.DateTime(allow_none=True)
+    points_possible = fields.Float(allow_none=True)
+    submission_types = fields.List(fields.Str())
+    has_submitted_submissions = fields.Bool()
+
+class QuizSchema(Schema):
+    """Represents course quizzes."""
+    canvas_quiz_id = fields.Int(attribute="id")
+    title = fields.Str()
+    html_url = fields.Str()
+    quiz_type = fields.Str()
+    time_limit = fields.Int(allow_none=True)
+    allowed_attempts = fields.Int(allow_none=True)
+    question_count = fields.Int()
+
+
+
+# ----------------------------------
+#  course schema
+# ----------------------------------
+class CourseSchema(Schema):
+    """The complete 'Full Course' schema."""
+    canvas_course_id = fields.Int(required=True, attribute="id")
+    name = fields.Str()
+    course_code = fields.Str()
+    syllabus_body = fields.Str(allow_none=True) # Course Content/Syllabus
+    
+    # Nested data
+    modules = fields.List(fields.Nested(ModuleSchema), dump_only=True)
+    assignments = fields.List(fields.Nested(AssignmentSchema), dump_only=True)
+    quizzes = fields.List(fields.Nested(QuizSchema), dump_only=True)
+    files = fields.List(fields.Nested(FileSchema), dump_only=True)
+    
+    # Grade information (returns for the current user)
+    enrollments = fields.List(fields.Dict(), dump_only=True)
+
