@@ -1,3 +1,4 @@
+# backend/app/schemas/auth.py
 from marshmallow import Schema, fields, validate
 
 

@@ -1,3 +1,4 @@
+# backend/app/schemas/canvas.py
 from marshmallow import Schema, fields
 
 # ----------------------------------

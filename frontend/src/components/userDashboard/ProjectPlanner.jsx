@@ -3,40 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Plus, CheckCircle, Mic } from 'lucide-react';
 import { Card, Button, Badge, ProgressBar, Form } from 'react-bootstrap';
 
-const mockProjects = [
-  {
-    id: '1',
-    title: 'Solar System Model',
-    description: 'Create a voice-described model of our solar system',
-    subject: 'Science',
-    progress: 60,
-    dueDate: 'Dec 30, 2025',
-    priority: 'high',
-    tasks: [
-      { id: '1-1', title: 'Research planet sizes', completed: true },
-      { id: '1-2', title: 'Learn orbital patterns', completed: true },
-      { id: '1-3', title: 'Record descriptions', completed: false },
-      { id: '1-4', title: 'Practice presentation', completed: false },
-    ],
-  },
-  {
-    id: '2',
-    title: 'Math Problem Set',
-    description: 'Complete 20 algebra problems with voice explanations',
-    subject: 'Mathematics',
-    progress: 75,
-    dueDate: 'Dec 28, 2025',
-    priority: 'medium',
-    tasks: [
-      { id: '2-1', title: 'Linear equations (10 problems)', completed: true },
-      { id: '2-2', title: 'Quadratic equations (5 problems)', completed: true },
-      { id: '2-3', title: 'Word problems (5 problems)', completed: false },
-    ],
-  },
-];
-
-export function ProjectPlanner() {
-  const [projects, setProjects] = useState(mockProjects);
+export function ProjectPlanner({ projects = [], setProjects = () => {} }) {
   const [expandedProject, setExpandedProject] = useState(null);
 
   const toggleTask = (projectId, taskId) => {

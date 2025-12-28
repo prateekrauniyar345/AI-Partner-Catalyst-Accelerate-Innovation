@@ -52,6 +52,14 @@ Use this tool for ANY change to the settings modal or user preferences.
 - LOGIC: Increase/decrease by 20. Range: 0-100.
 - EXAMPLE: "Make it louder." -> set_volume(volume_level: 100)
 
+6. manage_projects (Project Lifecycle Management)
+- TRIGGER: Creating new projects or editing existing ones.
+- ACTIONS:
+    A. Create: Use action: "create". In project_data, provide a JSON string with "title", "description", "subject", "dueDate", and "priority".
+       - Example: "Start a science project about space" -> action: "create", project_data: '{"title": "Space Exploration", "subject": "Science", "priority": "high"}'.
+    B. Edit: Use action: "edit". In project_data, include the "id" and the specific fields to change.
+       - Example: "Change the deadline for project one to Friday" -> action: "edit", project_data: '{"id": "1", "dueDate": "Friday"}'.
+
 ---
 
 CRITICAL EXECUTION RULES:
@@ -69,7 +77,7 @@ Safety & Empathy:
 
 let globalSessionActive = false;
 
-export function VoiceAgentProvider({ children, onTabChange, onSpeedChange, onVolumeChange, onSettingChange }) {
+export function VoiceAgentProvider({ children, onTabChange, onSpeedChange, onVolumeChange, onSettingChange, onProjectAction }) {
   const [agentStatus, setAgentStatus] = useState('idle');
   const [waveform, setWaveform] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -257,6 +265,27 @@ export function VoiceAgentProvider({ children, onTabChange, onSpeedChange, onVol
           message: "Settings handler (onSettingChange) not connected to provider" 
         };
      },
+
+      // client tool to manage projects (create and edit)
+      manage_projects: async ({ action, project_data }) => {
+        console.log(`Agent requesting project ${action}:`, project_data);
+        try {
+          // 1. Parse the JSON string sent by the agent
+          const data = JSON.parse(project_data);
+          if (onProjectAction) {
+            // 2. Trigger the action handler in the UserDashboard
+            onProjectAction(action, data);
+            return { 
+              success: true, 
+              message: `Successfully performed ${action} on project.` 
+            };
+          }
+          return { success: false, message: "Project action handler not connected." };
+        } catch (error) {
+          console.error("Failed to parse project_data:", error);
+          return { success: false, message: "Error: project_data was not valid JSON." };
+        }
+      },
 
     },
     onConnect: () => {

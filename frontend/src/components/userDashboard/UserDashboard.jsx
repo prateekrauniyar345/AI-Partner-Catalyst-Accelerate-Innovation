@@ -34,6 +34,39 @@ export default function UserDashboard() {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [privateMode, setPrivateMode] = useState(false);
 
+  // Lifted state for ProjectPlanner (controlled by both UI and voice commands)
+  const [projects, setProjects] = useState([
+    {
+      id: '1',
+      title: 'Solar System Model',
+      description: 'Create a voice-described model of our solar system',
+      subject: 'Science',
+      progress: 60,
+      dueDate: 'Dec 30, 2025',
+      priority: 'high',
+      tasks: [
+        { id: '1-1', title: 'Research planet sizes', completed: true },
+        { id: '1-2', title: 'Learn orbital patterns', completed: true },
+        { id: '1-3', title: 'Record descriptions', completed: false },
+        { id: '1-4', title: 'Practice presentation', completed: false },
+      ],
+    },
+    {
+      id: '2',
+      title: 'Math Problem Set',
+      description: 'Complete 20 algebra problems with voice explanations',
+      subject: 'Mathematics',
+      progress: 75,
+      dueDate: 'Dec 28, 2025',
+      priority: 'medium',
+      tasks: [
+        { id: '2-1', title: 'Linear equations (10 problems)', completed: true },
+        { id: '2-2', title: 'Quadratic equations (5 problems)', completed: true },
+        { id: '2-3', title: 'Word problems (5 problems)', completed: false },
+      ],
+    },
+  ]);
+
   // Handler for voice agent to change settings
   const handleSettingChange = (setting_id, value) => {
     console.log(`Setting change via voice: ${setting_id} = ${value}`);
@@ -71,6 +104,33 @@ export default function UserDashboard() {
     }
   };
 
+  // Handler for voice agent to manage projects (create and edit)
+  const handleProjectAction = (action, data) => {
+    console.log(`Project action via voice: ${action}`, data);
+    
+    if (action === 'create') {
+      const newProject = {
+        id: `project-${Date.now()}`, // Generate a unique ID
+        title: data.title || "New Project",
+        description: data.description || "",
+        subject: data.subject || "General",
+        progress: 0,
+        dueDate: data.dueDate || "Not set",
+        priority: data.priority || "medium",
+        tasks: data.tasks || [] // If agent suggested initial tasks
+      };
+      setProjects(prev => [...prev, newProject]);
+      console.log('Created new project:', newProject);
+    } 
+    
+    else if (action === 'edit') {
+      setProjects(prev => prev.map(proj => 
+        proj.id === data.id ? { ...proj, ...data } : proj
+      ));
+      console.log('Edited project:', data);
+    }
+  };
+
   const { user } = useUser();
   const displayName = user?.name || user?.full_name || (user?.email ? user.email.split('@')[0] : '');
   const userEmail = user?.email || '';
@@ -97,6 +157,7 @@ export default function UserDashboard() {
       onSpeedChange={setSpeed}
       onVolumeChange={setVolume}
       onSettingChange={handleSettingChange}
+      onProjectAction={handleProjectAction}
     >
       <div className="min-vh-100" style={{ backgroundColor: '#f7fafc', paddingBottom: activeTab !== 'Voice Learning' ? '100px' : '0' }}>
       {/* Top Status Bar - Fixed */}
@@ -302,7 +363,7 @@ export default function UserDashboard() {
                 <div className="row g-3">
                   <div className="col-lg-8">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                      <ProjectPlanner />
+                      <ProjectPlanner projects={projects} setProjects={setProjects} />
                     </motion.div>
                   </div>
                   <div className="col-lg-4">
@@ -366,7 +427,7 @@ export default function UserDashboard() {
               <div className="row g-3">
               <div className="col-lg-8">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                  <ProjectPlanner />
+                  <ProjectPlanner projects={projects} setProjects={setProjects} />
                 </motion.div>
               </div>
               <div className="col-lg-4">
