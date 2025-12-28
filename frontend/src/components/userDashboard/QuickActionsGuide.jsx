@@ -1,106 +1,112 @@
 import { motion } from 'framer-motion';
-import { Mic, BookOpen, Target, BarChart3, Settings, HelpCircle } from 'lucide-react';
+import { Mic, BookOpen, Target, BarChart3, Settings, HelpCircle, Code } from 'lucide-react';
 import { Card } from 'react-bootstrap';
 
 const voiceCommands = [
   {
-    category: 'Learning',
-    icon: BookOpen,
-    variant: 'primary',
-    commands: [
-      { phrase: '"Start a lesson"', action: 'Begin your next scheduled lesson' },
-      { phrase: '"Teach me about [topic]"', action: 'Start learning about any subject' },
-      { phrase: '"Explain again"', action: 'Repeat the last explanation' },
-      { phrase: '"Slow down" / "Speed up"', action: 'Adjust speaking pace' },
-      { phrase: '"Take a break"', action: 'Pause your learning session' },
-    ],
-  },
-  {
-    category: 'Progress',
+    category: 'Navigation',
     icon: BarChart3,
     variant: 'info',
     commands: [
-      { phrase: '"Show my progress"', action: 'View learning statistics' },
-      { phrase: '"What did I learn today?"', action: 'Daily summary' },
-      { phrase: '"My achievements"', action: 'List earned badges' },
-      { phrase: '"How am I doing?"', action: 'Get progress report' },
+      { phrase: '"Show my progress"', action: 'Switch to the Progress Tracker' },
+      { phrase: '"Open my courses"', action: 'View your Canvas courses' },
+      { phrase: '"Go to projects"', action: 'Navigate to the Project Planner' },
+      { phrase: '"Lesson plans"', action: 'Open your scheduled lessons' },
     ],
   },
   {
-    category: 'Planning',
-    icon: Target,
-    variant: 'success',
-    commands: [
-      { phrase: '"Plan a lesson"', action: 'Schedule new learning session' },
-      { phrase: '"Create project"', action: 'Start a new project' },
-      { phrase: '"Show my schedule"', action: 'View upcoming lessons' },
-      { phrase: '"What\'s next?"', action: 'Next scheduled activity' },
-    ],
-  },
-  {
-    category: 'Settings',
+    category: 'System & Accessibility',
     icon: Settings,
     variant: 'warning',
     commands: [
-      { phrase: '"Change voice"', action: 'Select different AI voice' },
-      { phrase: '"Speak slower" / "faster"', action: 'Adjust voice speed' },
-      { phrase: '"More details" / "Less details"', action: 'Change verbosity' },
-      { phrase: '"Settings"', action: 'Open settings panel' },
+      { phrase: '"Open settings"', action: 'Pop up the configuration modal' },
+      { phrase: '"High contrast mode"', action: 'Toggle visual accessibility' },
+      { phrase: '"Detailed responses"', action: 'Increase AI verbosity level' },
+      { phrase: '"Change voice to Michael"', action: 'Select a different AI persona' },
+      { phrase: '"Close settings"', action: 'Save and hide the settings panel' },
+    ],
+  },
+  {
+    category: 'Audio Controls',
+    icon: Mic,
+    variant: 'primary',
+    commands: [
+      { phrase: '"Speak slower"', action: 'Set playback speed to 0.8x' },
+      { phrase: '"Speak faster"', action: 'Increase playback speed to 1.4x' },
+      { phrase: '"Volume up / down"', action: 'Adjust agent audio levels' },
+      { phrase: '"Reset speed"', action: 'Return to standard 1.0x pace' },
+    ],
+  },
+  {
+    category: 'Developer Tools',
+    icon: Code,
+    variant: 'success',
+    commands: [
+      { phrase: '"Log [message]"', action: 'Record a note to the system console' },
+      { phrase: '"Alert me [message]"', action: 'Create a browser notification' },
     ],
   },
 ];
 
 export function QuickActionsGuide() {
   return (
-    <Card>
-      <Card.Header>
-        <Card.Title as="h5" className="d-flex align-items-center gap-2">
-          <Mic className="text-primary" />
-          Voice Commands Guide
+    <Card className="border-0 shadow-sm">
+      <Card.Header className="bg-white border-bottom-0 pt-4">
+        <Card.Title as="h5" className="d-flex align-items-center gap-2 fw-bold">
+          <div className="p-2 bg-primary rounded-3">
+            <Mic size={20} className="text-white" />
+          </div>
+          Voice Learning Commands
         </Card.Title>
+        <p className="small text-muted mb-0 mt-2">
+          VoiceEd Ally is listening! Try these commands to control your experience hands-free.
+        </p>
       </Card.Header>
 
       <Card.Body>
         {voiceCommands.map((category, categoryIndex) => {
           const Icon = category.icon;
           return (
-            <motion.div key={category.category} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: categoryIndex * 0.1 }} className="mb-3">
-              <div className="d-flex align-items-center gap-2 mb-2">
-                <div className={`d-inline-flex align-items-center justify-content-center rounded bg-${category.variant}-subtle`} style={{ width: 32, height: 32 }}>
-                  <Icon className={`text-${category.variant}`} />
-                </div>
-                <h4 className="mb-0 h6">{category.category}</h4>
+            <motion.div 
+              key={category.category} 
+              initial={{ opacity: 0, y: 10 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              transition={{ delay: categoryIndex * 0.1 }} 
+              className="mb-4"
+            >
+              <div className="d-flex align-items-center gap-2 mb-3">
+                <Icon size={18} className={`text-${category.variant}`} />
+                <h4 className="mb-0 h6 fw-bold text-uppercase small tracking-wider">{category.category}</h4>
               </div>
 
-              <div className="ms-3">
+              <div className="row g-2">
                 {category.commands.map((command, commandIndex) => (
-                  <motion.div key={commandIndex} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: categoryIndex * 0.1 + commandIndex * 0.05 }} className="mb-2">
-                    <div className="d-flex align-items-start gap-3 p-2 rounded">
-                      <div className={`bg-${category.variant}`} style={{ width: 8, height: 8, borderRadius: '50%', marginTop: 6, flexShrink: 0 }} />
-                      <div className="flex-grow-1">
-                        <code className={`small fw-normal text-${category.variant} bg-${category.variant}-subtle px-2 py-1 rounded`}>{command.phrase}</code>
-                        <p className="small text-muted mt-1 mb-0">{command.action}</p>
-                      </div>
+                  <div key={commandIndex} className="col-12 col-md-6">
+                    <div className="p-2 rounded-3 border bg-light-subtle h-100">
+                      <code className={`small fw-semibold text-${category.variant}`}>
+                        {command.phrase}
+                      </code>
+                      <p className="x-small text-muted mb-0 mt-1" style={{ fontSize: '0.75rem' }}>
+                        {command.action}
+                      </p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </motion.div>
           );
         })}
 
-        <div className="pt-3 border-top">
-          <div className="d-flex align-items-start gap-3 p-3 bg-primary-subtle rounded">
-            <HelpCircle className="text-primary" />
-            <div className="flex-grow-1">
-              <h5 className="small fw-semibold mb-1">Need Help?</h5>
-              <p className="small text-muted mb-0">Say <strong>"Help"</strong> or <strong>"What can you do?"</strong> anytime to get personalized assistance with voice commands.</p>
+        <div className="pt-3 border-top mt-2">
+          <div className="d-flex align-items-start gap-3 p-3 bg-primary-subtle rounded-3 border border-primary-subtle">
+            <HelpCircle className="text-primary flex-shrink-0" />
+            <div>
+              <h5 className="small fw-bold mb-1">Confused?</h5>
+              <p className="small text-muted mb-0">
+                Say <strong>"What can I say?"</strong> and Ally will describe the available tools for your current screen.
+              </p>
             </div>
           </div>
-        </div>
-
-        <div className="pt-3 border-top text-center">
-          <p className="small text-muted mb-0">💡 <strong>Accessibility Tip:</strong> All visual elements have spoken descriptions. You can navigate this entire dashboard using only your voice.</p>
         </div>
       </Card.Body>
     </Card>

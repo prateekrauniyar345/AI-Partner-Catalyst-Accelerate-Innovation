@@ -9,7 +9,7 @@ import { ProgressTracker } from './ProgressTracker';
 import { LessonPlanner } from './LessonPlanner';
 import { ProjectPlanner } from './ProjectPlanner';
 import { SettingsPanel } from './SettingsPanel';
-import { QuickActionsGuide } from './QuickActionsGuide';
+import { QuickActions } from './QuickActions';
 import UserCanvasCourses from './userCanvasCourses';
 import { useUser } from '../../contexts/userContext';
 import { VoiceAgentProvider } from '../../contexts/VoiceAgentContext';
@@ -80,7 +80,7 @@ export default function UserDashboard() {
     setIsMobileMenuOpen(false);
   };
 
-  // tab names are : Voice Learning, My Progress, Lesson Plans, My Courses, Projects
+  // tab names are : Voice Learning, My Progress, Lesson Plans, My Courses, Projects, Quick Actions
   // current navigation system
   const navOptions = {
     "Voice Learning": "Voice Learning",
@@ -88,6 +88,7 @@ export default function UserDashboard() {
     "Lesson Plans": "Lesson Plans",
     "My Courses" : "My Courses",
     "Projects": "Projects",
+    "Quick Actions": "Quick Actions",
   }
 
   return (
@@ -286,19 +287,15 @@ export default function UserDashboard() {
               )}
 
               {activeTab === 'Lesson Plans' && (
-                <div className="row g-3">
-                  <div className="col-lg-6">
-                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                      <LessonPlanner />
-                    </motion.div>
-                  </div>
-                  <div className="col-lg-6">
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded border p-3">
-                      <h3 className="fw-semibold mb-3">Quick Actions</h3>
-                      <QuickActionsGuide />
-                    </motion.div>
-                  </div>
-                </div>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                  <LessonPlanner />
+                </motion.div>
+              )}
+
+              {activeTab === 'Quick Actions' && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                  <QuickActions />
+                </motion.div>
               )}
 
               {activeTab === 'Projects' && (
@@ -356,19 +353,14 @@ export default function UserDashboard() {
               </div>
             )}
             {activeTab === 'Lesson Plans' && (
-               <div className="row g-3">
-               <div className="col-lg-6">
-                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                   <LessonPlanner />
-                 </motion.div>
-               </div>
-               <div className="col-lg-6">
-                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded border p-3">
-                   <h3 className="fw-semibold mb-3">Quick Actions</h3>
-                   <QuickActionsGuide />
-                 </motion.div>
-               </div>
-             </div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                <LessonPlanner />
+              </motion.div>
+            )}
+            {activeTab === 'Quick Actions' && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                <QuickActions />
+              </motion.div>
             )}
             {activeTab === 'Projects' && (
               <div className="row g-3">
