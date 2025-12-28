@@ -32,7 +32,7 @@ class TokenResponseSchema(Schema):
 
 class RefreshTokenSchema(Schema):
     """Payload for POST /auth/refresh."""
-    refresh_token = fields.Str(required=True)
+    refresh_token = fields.Str(required=False, allow_none=True)
 
 
 class PasswordResetRequestSchema(Schema):

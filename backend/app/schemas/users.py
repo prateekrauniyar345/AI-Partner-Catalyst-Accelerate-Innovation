@@ -3,10 +3,10 @@ from marshmallow import Schema, fields
 
 class UserSchema(Schema):
     """Full user representation (used for GET /users)."""
-    id = fields.Int(required=True)
+    id = fields.Str(required=True)  # Supabase uses UUID strings, not integers
     first_name = fields.Str(required=False, allow_none=True)
     last_name = fields.Str(required=False, allow_none=True)
-    username = fields.Str(required=True)
+    username = fields.Str(required=False, allow_none=True)  # username may not always be set
     email = fields.Email(required=True)
 
 

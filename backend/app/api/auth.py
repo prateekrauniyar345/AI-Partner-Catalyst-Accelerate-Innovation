@@ -298,7 +298,8 @@ def require_auth(f):
             user_resp = supabase_client.auth.get_user(token)
             print("Authenticated user:", user_resp)
             request.current_user = user_resp.user
-        except Exception:
+        except Exception as e:
+            current_app.logger.error(f"Token validation error: {e}")
             abort(401, message="Invalid or expired token")
         return f(*args, **kwargs)
     return wrapped

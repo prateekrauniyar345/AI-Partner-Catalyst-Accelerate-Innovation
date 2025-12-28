@@ -56,8 +56,8 @@ export async function signin(payload) {
 // - makes POST request to /auth/refresh relying on HttpOnly refresh cookie (no localStorage)
 // -------------------------------
 export async function refreshToken(refresh_token = null) {
-  // If using HttpOnly refresh cookie, call without body and include credentials.
-  const body = refresh_token ? JSON.stringify({ refresh_token }) : null;
+  // If using HttpOnly refresh cookie, call with empty object and include credentials.
+  const body = refresh_token ? JSON.stringify({ refresh_token }) : JSON.stringify({});
   const res = await fetch(`${API}/auth/refresh`, {
     method: "POST",
     headers: { 
