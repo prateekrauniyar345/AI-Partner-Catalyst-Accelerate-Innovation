@@ -3,10 +3,8 @@ import { motion } from 'framer-motion';
 import { RotateCcw, Play, Pause, SkipForward, Volume1, Volume2, Gauge } from 'lucide-react';
 import { Button, Form } from 'react-bootstrap';
 
-export function ActionStrip({ onAction }) {
+export function ActionStrip({ onAction, speed = 1.0, setSpeed, volume = 80, setVolume }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1.0);
-  const [volume, setVolume] = useState(80);
 
   const handleAction = (action, value) => {
     onAction?.(action, value);

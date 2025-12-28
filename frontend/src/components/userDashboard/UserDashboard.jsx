@@ -20,6 +20,10 @@ export default function UserDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Voice Learning');
 
+  // Lifted state for ActionStrip (controlled by both UI and voice commands)
+  const [speed, setSpeed] = useState(1.0);
+  const [volume, setVolume] = useState(80);
+
   const { user } = useUser();
   const displayName = user?.name || user?.full_name || (user?.email ? user.email.split('@')[0] : '');
   const userEmail = user?.email || '';
@@ -40,7 +44,11 @@ export default function UserDashboard() {
   }
 
   return (
-    <VoiceAgentProvider onTabChange={setActiveTab}>
+    <VoiceAgentProvider 
+      onTabChange={setActiveTab}
+      onSpeedChange={setSpeed}
+      onVolumeChange={setVolume}
+    >
       <div className="min-vh-100" style={{ backgroundColor: '#f7fafc', paddingBottom: activeTab !== 'Voice Learning' ? '100px' : '0' }}>
       {/* Top Status Bar - Fixed */}
       <header className="position-fixed top-0 start-0 end-0 bg-white border-bottom shadow-sm" style={{ zIndex: 1040 }}>
@@ -206,7 +214,7 @@ export default function UserDashboard() {
                       <VoiceControl />
                     </motion.div>
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-3">
-                      <ActionStrip />
+                      <ActionStrip speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
                     </motion.div>
                   </div>
                   <div className="col-lg-4">
