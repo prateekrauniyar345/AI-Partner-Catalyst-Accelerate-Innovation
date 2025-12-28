@@ -15,7 +15,7 @@ Tool Interaction Strategy:
 - Use show_resource proactively. For example, if you say "Let's look at a volcano," immediately trigger the tool with a relevant image or video URL.
 - When the user asks to log a message to the console, ALWAYS use the logMessage tool immediately. Don't explain how to code it - just execute the tool.
 - When the user asks to alert you about something, ALWAYS use the alertUser tool immediately. Don't explain how to code it - just execute the tool.
-- When the user asks to navigate or switch tabs (e.g., "show my progress", "go to lessons", "open projects"), use the navigate_tab tool to change the active tab.
+- When the user asks to navigate or switch tabs (e.g., "show my progress", "go to lessons", "open projects"), use the navigate_tabs tool to change the active tab.
 - When the user asks to scroll, expand sections, or control the UI, use the appropriate tool immediately.
 
 CRITICAL RULES:
@@ -25,7 +25,7 @@ CRITICAL RULES:
 4. When user aks to alert them, ALWAYS use the alertUser tool immediately. Do not explain how to code it - just execute the tool.
 
 Navigation & UI Control:
-When the user asks to navigate or switch tabs (e.g., "show my progress", "go to lessons", "open projects"), use the navigate_tab tool to change the active tab.
+When the user asks to navigate or switch tabs (e.g., "show my progress", "go to lessons", "open projects"), use the navigate_tabs tool to change the active tab.
 
 Safety & Empathy:
 - If the user expresses extreme frustration or distress, immediately pause the lesson. Suggest a "calming break" or offer to notify their caregiver.
@@ -173,22 +173,25 @@ export function VoiceAgentProvider({ children, onTabChange }) {
         return { success: true, message: "Resource opened in new tab" };
       },
 
-      // navigate to the different tabs in the userdashboard
-      navigate_tab: async ({ tab_name }) => {
+      // client tool to navigate tabs
+      navigate_tabs: async ({ tab_name }) => {
         console.log("Agent navigating to tab:", tab_name);
+        // This map matches your UI tabs seen in your screenshot (Voice Learning, My Progress, etc.)
         const tabMap = {
-          'Voice Learning' : "Voice Learning",
-          'My Progress': "My Progress",
-          'Lesson Plan': "Lesson Plan",
-          'My Courses': "My Courses",
-          'Projects': "Projects",
+          "Voice Learning": "Voice Learning",
+          "My Progress": "My Progress",
+          "Lesson Plans": "Lesson Plans",
+          "My Courses" : "My Courses",
+          "Projects": "Projects",
         };
-        const targetTab = tabMap[tab_name.toLowerCase()] || 'learn';
+        const targetTab = tabMap[tab_name] || 'Voice Learning';
         if (onTabChange) {
           onTabChange(targetTab);
+          return { success: true, message: `Successfully navigated to ${targetTab}` };
         }
-        return { success: true, message: `Navigated to ${targetTab} tab` };
+        return { success: false, message: "Navigation failed: onTabChange handler missing" };
       },
+
     },
     onConnect: () => {
       console.log("Connected to ElevenLabs!");

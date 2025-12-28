@@ -29,6 +29,7 @@ export default function UserDashboard() {
     setIsMobileMenuOpen(false);
   };
 
+  // tab names are : Voice Learning, My Progress, Lesson Plans, My Courses, Projects
   // current navigation system
   const navOptions = {
     "Voice Learning": "Voice Learning",
