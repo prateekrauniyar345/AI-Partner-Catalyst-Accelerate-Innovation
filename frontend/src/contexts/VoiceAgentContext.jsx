@@ -14,6 +14,7 @@ Core Behavioral Guidelines:
 Tool Interaction Strategy:
 - Use show_resource proactively. For example, if you say "Let's look at a volcano," immediately trigger the tool with a relevant image or video URL.
 - When the user asks to log a message to the console, ALWAYS use the logMessage tool immediately. Don't explain how to code it - just execute the tool.
+- When the user asks to alert you about something, ALWAYS use the alertUser tool immediately. Don't explain how to code it - just execute the tool.
 - When the user asks to navigate or switch tabs (e.g., "show my progress", "go to lessons", "open projects"), use the navigate_tab tool to change the active tab.
 - When the user asks to scroll, expand sections, or control the UI, use the appropriate tool immediately.
 
@@ -21,6 +22,7 @@ CRITICAL RULES:
 1. If the user says "log [something] to the console" or similar, you MUST call the logMessage tool with that message. Do not explain how to write code - actually execute the tool and confirm.
 2. ALWAYS use tools when available instead of explaining how to do something manually.
 3. Execute the tool first, then provide a brief confirmation of what you did.
+4. When user aks to alert them, ALWAYS use the alertUser tool immediately. Do not explain how to code it - just execute the tool.
 
 Navigation & UI Control:
 When the user asks to navigate or switch tabs (e.g., "show my progress", "go to lessons", "open projects"), use the navigate_tab tool to change the active tab.
@@ -150,11 +152,28 @@ export function VoiceAgentProvider({ children, onTabChange }) {
         console.log("AGENT LOG for client tool:", message);
         return "Message logged to console";
       },
+
+      // alert user tool
+      // alertUser: (message) => {
+      //   alert({message});
+      //   console.log("AGENT ALERT for client tool:", message);
+      //   return "User alerted";
+      // },
+      alertUser: (message) => {
+        // Now 'message' is the actual string, not the whole object
+        alert(message.message); 
+        console.log("AGENT ALERT for client tool:", message);
+        return "User alerted";
+      },
+
+      // show the resource in a new tab
       show_resource: async ({ resource_url }) => {
         console.log("Agent wants to show resource:", resource_url);
         window.open(resource_url, '_blank');
         return { success: true, message: "Resource opened in new tab" };
       },
+
+      // navigate to the different tabs in the userdashboard
       navigate_tab: async ({ tab_name }) => {
         console.log("Agent navigating to tab:", tab_name);
         const tabMap = {
