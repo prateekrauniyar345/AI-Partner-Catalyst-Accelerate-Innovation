@@ -226,6 +226,31 @@ export default function UserCanvasCourses() {
   const [courseDetails, setCourseDetails] = useState({}); // { courseId: { modules, assignments, quizzes } }
   const [loadingCourseId, setLoadingCourseId] = useState(null);
 
+  console.log("courses loaded:", courses);  
+   //   state for sylabus
+  const [syllabus, setSyllabus] = useState({});
+
+  useEffect(()=>{
+    async function getCourseSyllabus(){
+        try{
+            for (const course of courses){
+                const syllabusData = await canvasApi.getCourse(course.canvas_course_id);
+                setSyllabus((prev) => ({
+                    ...prev,
+                    [course.canvas_course_id]: syllabusData.syllabus_body || 'No syllabus available',
+                }));
+            }
+        }catch(e){
+            console.error("Error fetching syllabus:", e);
+        }
+    }
+    getCourseSyllabus();
+  }, [ courses ]); 
+
+
+
+  console.log("sylabus are : ", syllabus);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
