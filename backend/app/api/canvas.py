@@ -2,15 +2,29 @@ from flask_smorest import Blueprint, abort
 from flask import request
 
 from ..services.canvas_service import (
+    get_user_information,
     get_user_courses,
     get_course_modules,
-    get_module_items,
+    # get_module_items,
 )
-from ..schemas.canvas import CourseSchema, ModuleSchema, ModuleItemSchema
+from ..schemas.canvas import UserSchema, CourseSchema, ModuleSchema, ModuleItemSchema
 
 
 canvas_blp = Blueprint("canvas", __name__, url_prefix="/canvas", description="Canvas proxy endpoints")
 
+
+@canvas_blp.route("/user/information", methods=["GET"])
+@canvas_blp.response(200, UserSchema(many=False))
+def user_information():
+    """GET /canvas/user/information
+
+    Returns information about the current user.
+    """
+    try:
+        data = get_user_information()
+    except Exception as e:
+        abort(502, message=str(e))
+    return data
 
 @canvas_blp.route("/courses", methods=["GET"])
 @canvas_blp.response(200, CourseSchema(many=True))
@@ -43,15 +57,15 @@ def list_modules(course_id):
     return data
 
 
-@canvas_blp.route("/courses/<int:course_id>/modules/<int:module_id>/items", methods=["GET"])
-@canvas_blp.response(200, ModuleItemSchema(many=True))
-def list_module_items(course_id, module_id):
-    """GET /canvas/courses/<course_id>/modules/<module_id>/items
+# @canvas_blp.route("/courses/<int:course_id>/modules/<int:module_id>/items", methods=["GET"])
+# @canvas_blp.response(200, ModuleItemSchema(many=True))
+# def list_module_items(course_id, module_id):
+#     """GET /canvas/courses/<course_id>/modules/<module_id>/items
 
-    Returns module items for a given course/module.
-    """
-    try:
-        data = get_module_items(course_id, module_id)
-    except Exception as e:
-        abort(502, message=str(e))
-    return data
+#     Returns module items for a given course/module.
+#     """
+#     try:
+#         data = get_module_items(course_id, module_id)
+#     except Exception as e:
+#         abort(502, message=str(e))
+#     return data

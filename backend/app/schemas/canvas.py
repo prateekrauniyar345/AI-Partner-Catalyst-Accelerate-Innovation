@@ -1,5 +1,33 @@
 from marshmallow import Schema, fields
 
+# ----------------------------------
+#  user schema
+# ----------------------------------
+class UserSchema(Schema):
+    """Represents a Canvas user (student, teacher, admin, etc.)."""
+    canvas_user_id = fields.Int(required=True, attribute="id")
+    name = fields.Str(attribute="name")
+    sortable_name = fields.Str(attribute="sortable_name", allow_none=True)
+    short_name = fields.Str(attribute="short_name", allow_none=True)
+    
+    # Login and SIS information
+    login_id = fields.Str(attribute="login_id", allow_none=True)
+    sis_user_id = fields.Str(attribute="sis_user_id", allow_none=True)
+    integration_id = fields.Str(attribute="integration_id", allow_none=True)
+    
+    # Profile details
+    email = fields.Str(attribute="email", allow_none=True)
+    avatar_url = fields.Str(attribute="avatar_url", allow_none=True)
+    bio = fields.Str(attribute="bio", allow_none=True)
+    pronouns = fields.Str(attribute="pronouns", allow_none=True)
+    
+    # Localization and Activity
+    locale = fields.Str(attribute="locale", allow_none=True)
+    time_zone = fields.Str(attribute="time_zone", allow_none=True)
+    last_login = fields.DateTime(attribute="last_login", allow_none=True)
+
+    # Optional: Permissions list returned by the /users/:id endpoint
+    permissions = fields.Dict(allow_none=True)
 
 class CourseSchema(Schema):
     """Represents a Canvas course. Maps Canvas' JSON fields to our schema."""
