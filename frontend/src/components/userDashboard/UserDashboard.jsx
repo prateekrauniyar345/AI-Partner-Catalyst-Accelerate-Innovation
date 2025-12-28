@@ -10,6 +10,7 @@ import { LessonPlanner } from './LessonPlanner';
 import { ProjectPlanner } from './ProjectPlanner';
 import { SettingsPanel } from './SettingsPanel';
 import { QuickActionsGuide } from './QuickActionsGuide';
+import UserCanvasCourses from './userCanvasCourses';
 import { useUser } from '../../contexts/userContext';
 import { VoiceAgentProvider } from '../../contexts/VoiceAgentContext';
 
@@ -221,6 +222,12 @@ export default function UserDashboard() {
                 </motion.div>
               )}
 
+              {activeTab === 'my_courese' && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                  <UserCanvasCourses />
+                </motion.div>
+              )}
+
               {activeTab === 'lesson_plans' && (
                 <div className="row g-3">
                   <div className="col-lg-6">
@@ -285,6 +292,11 @@ export default function UserDashboard() {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <ProgressTracker />
               </motion.div>
+            )}
+            {activeTab === 'my_courese' && (
+              <div>
+                <UserCanvasCourses />
+              </div>
             )}
             {activeTab === 'lesson_plans' && (
                <div className="row g-3">

@@ -24,7 +24,7 @@ class UserSchema(Schema):
     # Localization and Activity
     locale = fields.Str(attribute="locale", allow_none=True)
     time_zone = fields.Str(attribute="time_zone", allow_none=True)
-    last_login = fields.DateTime(attribute="last_login", allow_none=True)
+    last_login = fields.Str(attribute="last_login", allow_none=True)
 
     # Optional: Permissions list returned by the /users/:id endpoint
     permissions = fields.Dict(allow_none=True)
@@ -47,7 +47,7 @@ class ModuleSchema(Schema):
     canvas_module_id = fields.Int(required=True, attribute="id")
     name = fields.Str(attribute="name")
     position = fields.Int(attribute="position", allow_none=True)
-    unlock_at = fields.DateTime(attribute="unlock_at", allow_none=True)
+    unlock_at = fields.Str(attribute="unlock_at", allow_none=True)
 
 # ----------------------------------
 #  query schemas for module query
@@ -78,14 +78,14 @@ class FileSchema(Schema):
     url = fields.Str()
     content_type = fields.Str(attribute="content-type")
     size = fields.Int()
-    updated_at = fields.DateTime()
+    updated_at = fields.Str(allow_none=True)
 
 class AssignmentSchema(Schema):
     """Represents course assignments."""
     canvas_assignment_id = fields.Int(attribute="id")
     name = fields.Str()
     description = fields.Str(allow_none=True) # This is the "Content"
-    due_at = fields.DateTime(allow_none=True)
+    due_at = fields.Str(allow_none=True)
     points_possible = fields.Float(allow_none=True)
     submission_types = fields.List(fields.Str())
     has_submitted_submissions = fields.Bool()
