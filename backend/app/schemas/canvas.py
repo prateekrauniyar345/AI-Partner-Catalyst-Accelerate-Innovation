@@ -39,6 +39,11 @@ class CourseSchema(Schema):
     start_at = fields.DateTime(attribute="start_at", allow_none=True)
     end_at = fields.DateTime(attribute="end_at", allow_none=True)
 
+# ----------------------------------
+#  query schemas for course query
+# ----------------------------------
+class CoursesQuerySchema(Schema):
+    canvas_user_id = fields.Str(required=False, metadata={"description": "Canvas user id (optional). If omitted, uses /users/self"})
 
 class ModuleSchema(Schema):
     """Represents a Canvas module (section)."""
@@ -46,6 +51,16 @@ class ModuleSchema(Schema):
     name = fields.Str(attribute="name")
     position = fields.Int(attribute="position", allow_none=True)
     unlock_at = fields.DateTime(attribute="unlock_at", allow_none=True)
+
+
+
+# ----------------------------------
+#  query schemas for module query
+# ----------------------------------
+class ModulesQuerySchema(Schema):
+    course_id = fields.Int(required=False, metadata={"description": "Optional Canvas course id. If omitted, returns modules for all user courses."})
+    canvas_user_id = fields.Str(required=False, metadata={"description": "Optional Canvas user id for listing courses (fallback uses /users/self)."})
+
 
 
 class ModuleItemSchema(Schema):
