@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import canvasApi from '../../services/canvasApi';
 import { Card, Button, Spinner, Accordion } from 'react-bootstrap';
 
-function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizzes, isLoading }) {
+function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizzes, syllabus, isLoading }) {
   return (
     <Card style={{ marginBottom: 16, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
       <Card.Header
@@ -58,35 +58,35 @@ function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizze
             </div>
           ) : (
             <>
-              {/* Course Description / Syllabus */}
-              <div className="mb-4">
-                <h6 className="fw-bold mb-2">Course Overview</h6>
-                {course.description || course.syllabus ? (
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color: '#333',
-                      padding: 12,
-                      backgroundColor: '#fff',
-                      borderRadius: 6,
-                      border: '1px solid #dee2e6',
-                    }}
-                    dangerouslySetInnerHTML={{
-                      __html: course.description || course.syllabus || 'No description available',
-                    }}
-                  />
-                ) : (
-                  <div style={{ fontSize: 13, color: '#999' }}>No description available</div>
-                )}
-              </div>
+              {/* Course Syllabus */}
+              {syllabus && (
+                <div className="mb-4">
+                  <h6 className="fw-bold mb-2">Course Syllabus</h6>
+                  <Accordion defaultActiveKey={null} className="mb-3">
+                    <Accordion.Item eventKey="syllabus" key="syllabus">
+                      <Accordion.Header>
+                        <strong>📖 View Course Syllabus</strong>
+                      </Accordion.Header>
+                      <Accordion.Body style={{ fontSize: 13 }}>
+                        <div
+                          style={{
+                            color: '#333',
+                          }}
+                          dangerouslySetInnerHTML={{ __html: syllabus }}
+                        />
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
+                </div>
+              )}
 
               {/* Modules */}
               <div className="mb-4">
                 <h6 className="fw-bold mb-2">Modules ({modules?.length || 0})</h6>
                 {modules && modules.length > 0 ? (
                   <Accordion defaultActiveKey={null} className="mb-3">
-                    {modules.map((m, idx) => (
-                      <Accordion.Item eventKey={String(idx)} key={m.id}>
+                    {modules.map((m) => (
+                      <Accordion.Item eventKey={`module-${m.id || m.canvas_module_id}`} key={m.id || m.canvas_module_id}>
                         <Accordion.Header>{m.name}</Accordion.Header>
                         <Accordion.Body style={{ fontSize: 13 }}>
                           <div className="mb-2">
@@ -115,8 +115,8 @@ function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizze
                 <h6 className="fw-bold mb-2">Assignments ({assignments?.length || 0})</h6>
                 {assignments && assignments.length > 0 ? (
                   <Accordion defaultActiveKey={null} className="mb-3">
-                    {assignments.map((a, idx) => (
-                      <Accordion.Item eventKey={String(idx)} key={a.id}>
+                    {assignments.map((a) => (
+                      <Accordion.Item eventKey={`assignment-${a.id || a.canvas_assignment_id}`} key={a.id || a.canvas_assignment_id}>
                         <Accordion.Header>
                           <div>
                             <strong>{a.name}</strong>
@@ -164,8 +164,8 @@ function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizze
                 <h6 className="fw-bold mb-2">Quizzes ({quizzes?.length || 0})</h6>
                 {quizzes && quizzes.length > 0 ? (
                   <Accordion defaultActiveKey={null} className="mb-3">
-                    {quizzes.map((q, idx) => (
-                      <Accordion.Item eventKey={String(idx)} key={q.id}>
+                    {quizzes.map((q) => (
+                      <Accordion.Item eventKey={`quiz-${q.id || q.canvas_quiz_id}`} key={q.id || q.canvas_quiz_id}>
                         <Accordion.Header>
                           <div>
                             <strong>{q.title}</strong>
@@ -359,6 +359,7 @@ export default function UserCanvasCourses() {
               modules={courseDetails[c.id || c.canvas_course_id]?.modules}
               assignments={courseDetails[c.id || c.canvas_course_id]?.assignments}
               quizzes={courseDetails[c.id || c.canvas_course_id]?.quizzes}
+              syllabus={syllabus[c.canvas_course_id]}
               isLoading={loadingCourseId === (c.id || c.canvas_course_id)}
             />
           ))}
