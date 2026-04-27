@@ -33,6 +33,7 @@ function MainApp() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/verify" element={<VerifyEmail />} />
+        <Route path="/auth/verify-email" element={<VerifyEmail />} />
         
         {/* Protected routes - require authentication */}
         <Route path="/chat" element={

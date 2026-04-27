@@ -7,7 +7,7 @@ supabase_config = SupabaseConfig()
 
 def get_supabase() -> Client:
     url = supabase_config.SUPABASE_URL
-    key = supabase_config.SUPABASE_API_KEY
+    key = supabase_config.SUPABASE_SERVICE_ROLE_KEY
     if not url or not key:
         raise RuntimeError("Supabase URL or Service Role key not set")
     return create_client(

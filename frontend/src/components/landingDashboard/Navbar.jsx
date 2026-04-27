@@ -110,8 +110,8 @@ export default function Navbar({ onStartLearning }) {
                   type="button"
                   className="btn btn-link text-decoration-none"
                   style={{ color: '#374151', fontSize: '0.95rem', fontWeight: '400' }}
-                  onClick={() => {
-                    signOut()
+                  onClick={async () => {
+                    await signOut()
                     navigate('/')
                   }}
                 >
@@ -209,7 +209,7 @@ export default function Navbar({ onStartLearning }) {
                     <button
                       type="button"
                       className="btn btn-outline-secondary w-100"
-                      onClick={() => { setIsMobileMenuOpen(false); signOut(); navigate('/'); }}
+                      onClick={async () => { setIsMobileMenuOpen(false); await signOut(); navigate('/'); }}
                     >
                       Sign Out
                     </button>

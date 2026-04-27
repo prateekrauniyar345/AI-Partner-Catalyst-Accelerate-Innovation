@@ -18,6 +18,6 @@ class Config(BaseSettings):
 
 class SupabaseConfig(BaseSettings):
     SUPABASE_URL: str = Field(os.getenv("SUPABASE_URL"), description="The Supabase project URL")
-    SUPABASE_API_KEY: str = Field(os.getenv("SUPABASE_API_KEY"), description="The Supabase API key")
+    SUPABASE_SERVICE_ROLE_KEY: str = Field(os.getenv("SUPABASE_SERVICE_ROLE_KEY"), description="The Supabase Service Role key")
 
     

@@ -55,7 +55,7 @@ def signup(data):
                 "password": password, 
                 "options": {
                     "data": user_metadata, 
-                    "email_redirect_to": f"{current_app.config.get('FRONTEND_REDIRECT_URL')}/signin"
+                    "email_redirect_to": f"{current_app.config.get('FRONTEND_REDIRECT_URL')}/auth/verify-email"
                 }
             }
            )
@@ -338,6 +338,48 @@ def verify_email(data):
     secure_flag = not current_app.config.get("DEBUG", False)
     out.set_cookie("access_token", session.access_token, httponly=True, secure=secure_flag, samesite="Lax", max_age=3600, path="/")
     out.set_cookie("refresh_token", session.refresh_token, httponly=True, secure=secure_flag, samesite="Lax", max_age=604800, path="/auth/refresh")
+    return out
+
+
+# -------------------------------------
+# Set tokens from Supabase email confirmation
+# -------------------------------------
+@auth_blp.post("/set-tokens")
+def set_tokens():
+    """
+    Frontend sends tokens from Supabase email confirmation link.
+    Backend sets them as secure HttpOnly cookies.
+    """
+    data = request.get_json() or {}
+    access_token = data.get("access_token")
+    refresh_token = data.get("refresh_token")
+
+    if not access_token or not refresh_token:
+        abort(400, message="Missing access_token or refresh_token")
+
+    out = make_response(jsonify({"message": "Tokens set successfully"}), 200)
+    secure_flag = not current_app.config.get("DEBUG", False)
+
+    out.set_cookie(
+        "access_token",
+        access_token,
+        httponly=True,
+        secure=secure_flag,
+        samesite="Lax",
+        max_age=3600,
+        path="/",
+    )
+
+    out.set_cookie(
+        "refresh_token",
+        refresh_token,
+        httponly=True,
+        secure=secure_flag,
+        samesite="Lax",
+        max_age=604800,
+        path="/",
+    )
+
     return out
 
 
