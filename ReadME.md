@@ -133,6 +133,10 @@ Run the Flask API locally:
 ```bash
 flask run --host=0.0.0.0 --port=5000
 ```
+**Backend API-DOCS url. : http://127.0.0.1:5000/v1/swagger-ui**
+
+----
+
 
 The frontend will talk to the backend via `VITE_API_BASE_URL` (default `http://localhost:5000`).
 
@@ -176,10 +180,6 @@ Contributions are welcome! Feel free to open issues or PRs.
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Authors
-
-- [Your Name] - Creator & Developer
-- Built for Google Cloud AI Partner Catalyst Hackathon - ElevenLabs Challenge
 
 ## 🙏 Acknowledgments
 
