@@ -82,7 +82,7 @@ export default function Navbar({ onStartLearning }) {
                     type="button"
                     className="btn p-0 border-0 d-flex align-items-center justify-content-center ms-3"
                     style={{ width: 36, height: 36, background: 'linear-gradient(90deg,#7c3aed,#ec4899)', borderRadius: 8 }}
-                    onClick={(e) => { e.preventDefault(); navigate('/chat'); }}
+                    onClick={(e) => { e.preventDefault(); navigate('/dashboard'); }}
                     aria-label="Open chat"
                   >
                     <MessageCircle style={{ width: 18, height: 18, color: 'white' }} />

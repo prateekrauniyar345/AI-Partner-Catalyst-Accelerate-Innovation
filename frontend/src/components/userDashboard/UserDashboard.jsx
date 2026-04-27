@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Nav } from 'react-bootstrap';
 import { VoiceControl } from './VoiceControl';
@@ -131,7 +132,8 @@ export default function UserDashboard() {
     }
   };
 
-  const { user } = useUser();
+  const { user, signOut } = useUser();
+  const navigate = useNavigate();
   const displayName = user?.name || user?.full_name || (user?.email ? user.email.split('@')[0] : '');
   const userEmail = user?.email || '';
 
@@ -204,17 +206,34 @@ export default function UserDashboard() {
                 <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" />
               </Button>
 
-              <Button variant="light" className="rounded-3 p-1" aria-label="Help" title="Help" style={{ minWidth: 60, height: 36, fontSize: 13 }}>
+              <Button 
+                variant="light" 
+                className="rounded-3 p-1" 
+                aria-label="Help" title="Help" 
+                style={{ minWidth: 60, height: 36, fontSize: 13 }}
+              >
                 Help
               </Button>
 
-              <Button variant="light" className="rounded-3 p-1" onClick={() => setIsSettingsOpen(true)} aria-label="Settings" title="Settings" style={{ minWidth: 80, height: 36, fontSize: 13 }}>
+              <Button 
+                variant="light" 
+                className="rounded-3 p-1" 
+                onClick={() => setIsSettingsOpen(true)} aria-label="Settings" title="Settings" 
+                style={{ minWidth: 80, height: 36, fontSize: 13 }}
+              >
                 Settings
               </Button>
 
               <div className="vr d-none d-md-block" />
 
-              <Button variant="light" className="rounded-3 p-1" aria-label="Sign out" title="Sign out" style={{ minWidth: 80, height: 36, fontSize: 13 }}>
+              <Button 
+                variant="light" 
+                className="rounded-3 p-1" 
+                aria-label="Sign out" 
+                title="Sign out" 
+                onClick={async () => { await signOut(); navigate('/'); }} 
+                style={{ minWidth: 80, height: 36, fontSize: 13 }}
+              >
                 Sign out
               </Button>
             </div>

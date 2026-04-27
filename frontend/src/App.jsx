@@ -36,11 +36,12 @@ function MainApp() {
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
         
         {/* Protected routes - require authentication */}
-        <Route path="/chat" element={
+        {/* curently getting rid of chat route */}
+        {/* <Route path="/chat" element={
           <ProtectedRoute>
             <ChatInterface />
           </ProtectedRoute>
-        } />
+        } /> */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <UserDashboardPage />
