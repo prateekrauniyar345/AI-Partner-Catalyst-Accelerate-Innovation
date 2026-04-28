@@ -18,6 +18,7 @@ import UserDashboardPage from './pages/UserDashboardPage'
 import ProtectedRoute from './components/protectedRoutes/ProtectedRoute'
 
 import { UserProvider, useUser } from './contexts/userContext'
+import { ResourceProvider } from './contexts/ResourceContext'
 
 function MainApp() {
   const { user } = useUser()
@@ -59,7 +60,9 @@ function MainApp() {
 export default function App() {
   return (
     <UserProvider>
-      <MainApp />
+      <ResourceProvider>
+        <MainApp />
+      </ResourceProvider>
     </UserProvider>
   )
 }

@@ -60,10 +60,10 @@ Use this tool for ANY change to the settings modal or user preferences.
 7. manage_projects (Project Lifecycle Management)
 - TRIGGER: Creating new projects or editing existing ones.
 - ACTIONS:
-    A. Create: Use action: "create". In project_data, provide a JSON string with "title", "description", "subject", "dueDate", and "priority".
-       - Example: "Start a science project about space" -> action: "create", project_data: '{"title": "Space Exploration", "subject": "Science", "priority": "high"}'.
-    B. Edit: Use action: "edit". In project_data, include the "id" and the specific fields to change.
-       - Example: "Change the deadline for project one to Friday" -> action: "edit", project_data: '{"id": "1", "dueDate": "Friday"}'.
+    A. Create: Use action: "create". In project_data, provide a JSON string with "title", "description", "subject", "due_date" (use snake_case, format YYYY-MM-DD or null), and "priority" (one of: "low", "medium", "high").
+       - Example: "Start a science project about space" -> action: "create", project_data: '{"title": "Space Exploration", "subject": "Science", "priority": "high", "due_date": null}'.
+    B. Edit: Use action: "edit". In project_data, include the "id" and the specific fields to change. Use "due_date" (snake_case) for date changes.
+       - Example: "Change the deadline for project one to Friday" -> action: "edit", project_data: '{"id": "<uuid>", "due_date": "2026-05-02"}'.
 
 8. control_course_ui (Canvas Course UI Control)
 - TRIGGER: User wants to open/close a course or expand/collapse a section (Syllabus, Modules, Assignments, Quizzes) inside an open course.

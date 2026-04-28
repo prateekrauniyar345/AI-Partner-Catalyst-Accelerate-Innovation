@@ -6,6 +6,20 @@ from ..auth.supabase_client import supabase_client
 supabase = supabase_client
 
 def list_projects(user_id: str, query_params: dict = None):
+    print(f"[projects_service] list_projects called with user_id={user_id!r} ({type(user_id).__name__}), query_params={query_params}")
+
+    # Sanity check: count ALL rows in the table (service-role bypasses RLS).
+    # If this returns 0, the supabase client is NOT using the service role key,
+    # or the table is empty / wrong project.
+    try:
+        all_rows = supabase.table("projects").select("id,user_id,name").execute()
+        print(f"[projects_service] table contains {len(all_rows.data or [])} total rows (service-role view)")
+        if all_rows.data:
+            for r in all_rows.data[:5]:
+                print(f"  - id={r.get('id')} user_id={r.get('user_id')!r} name={r.get('name')!r}")
+    except Exception as e:
+        print(f"[projects_service] sanity probe failed: {e}")
+
     query = supabase.table("projects").select("*").eq("user_id", user_id)
     
     if query_params:
@@ -26,6 +40,7 @@ def list_projects(user_id: str, query_params: dict = None):
             query = query.eq("due_date", query_params["due_date"].isoformat() if hasattr(query_params["due_date"], "isoformat") else query_params["due_date"])
             
     res = query.order("created_at", desc=True).execute()
+    print(f"[projects_service] filtered query returned {len(res.data or [])} rows for user_id={user_id!r}")
     return res.data or []
 
 def create_project(user_id: str, payload: dict):

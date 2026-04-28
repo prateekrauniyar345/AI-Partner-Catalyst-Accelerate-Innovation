@@ -14,9 +14,13 @@ projects_blp = Blueprint("projects", __name__, url_prefix="/projects", descripti
 @projects_blp.response(200, ProjectOutSchema(many=True))
 def get_projects(query_params):
     user_id = get_current_user_id()
+    print(f"DEBUG GET /projects - user_id: {user_id}, query_params: {query_params}")
     try:
-        return list_projects(user_id, query_params)
+        projects = list_projects(user_id, query_params)
+        print(f"DEBUG GET /projects - returned {len(projects)} projects")
+        return projects
     except Exception as e:
+        print(f"DEBUG GET /projects - Error: {e}")
         abort(502, message=str(e))
 
 @projects_blp.route("/", methods=["POST"])

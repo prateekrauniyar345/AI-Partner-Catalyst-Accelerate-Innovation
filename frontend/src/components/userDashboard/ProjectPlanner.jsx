@@ -9,11 +9,12 @@ export function ProjectPlanner({ projects = [], setProjects = () => {} }) {
   const toggleTask = (projectId, taskId) => {
     setProjects(projects.map(project => {
       if (project.id === projectId) {
-        const updatedTasks = project.tasks.map(task =>
+        const tasks = project.tasks || [];
+        const updatedTasks = tasks.map(task =>
           task.id === taskId ? { ...task, completed: !task.completed } : task
         );
         const completedTasks = updatedTasks.filter(t => t.completed).length;
-        const progress = Math.round((completedTasks / updatedTasks.length) * 100);
+        const progress = updatedTasks.length > 0 ? Math.round((completedTasks / updatedTasks.length) * 100) : 0;
 
         announceAction(
           updatedTasks.find(t => t.id === taskId)?.completed
@@ -107,7 +108,7 @@ export function ProjectPlanner({ projects = [], setProjects = () => {} }) {
                           <Badge bg="info">
                             {project.subject}
                           </Badge>
-                          <span className="small text-muted">Due: {project.dueDate}</span>
+                          <span className="small text-muted">Due: {project.dueDate || project.due_date || 'No date set'}</span>
                         </div>
                       </div>
                       <div className="fw-bold text-primary" style={{ fontSize: '1.5rem' }}>
@@ -116,13 +117,13 @@ export function ProjectPlanner({ projects = [], setProjects = () => {} }) {
                     </div>
 
                     <div className="mb-3">
-                      <ProgressBar now={project.progress} style={{ height: '8px' }} />
+                      <ProgressBar now={project.progress || 0} style={{ height: '8px' }} />
                       <div className="d-flex justify-content-between align-items-center small text-muted mt-1 flex-wrap">
                         <span>
-                          {project.tasks.filter(t => t.completed).length} of {project.tasks.length} tasks completed
+                          {((project.tasks || []).filter(t => t.completed).length)} of {(project.tasks || []).length} tasks completed
                         </span>
                         <span>
-                          {project.progress === 100 ? '✓ Complete' : `${100 - project.progress}% remaining`}
+                          {(project.progress || 0) === 100 ? '✓ Complete' : `${100 - (project.progress || 0)}% remaining`}
                         </span>
                       </div>
                     </div>
@@ -138,7 +139,7 @@ export function ProjectPlanner({ projects = [], setProjects = () => {} }) {
                       >
                         <h6 className="small fw-semibold mb-3">Tasks</h6>
                         <div className="d-flex flex-column gap-2" role="list" aria-label={`Tasks for ${project.title}`}>
-                          {project.tasks.map((task) => (
+                          {(project.tasks || []).map((task) => (
                             <motion.div
                               key={task.id}
                               whileHover={{ x: 4 }}

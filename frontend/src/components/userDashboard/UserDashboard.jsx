@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Nav } from 'react-bootstrap';
@@ -14,6 +14,7 @@ import { QuickActions } from './QuickActions';
 import UserCanvasCourses from './userCanvasCourses';
 import { useUser } from '../../contexts/userContext';
 import { VoiceAgentProvider } from '../../contexts/VoiceAgentContext';
+import { useResources } from '../../contexts/ResourceContext';
 
 export default function UserDashboard() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -36,37 +37,7 @@ export default function UserDashboard() {
   const [privateMode, setPrivateMode] = useState(false);
 
   // Lifted state for ProjectPlanner (controlled by both UI and voice commands)
-  const [projects, setProjects] = useState([
-    {
-      id: '1',
-      title: 'Solar System Model',
-      description: 'Create a voice-described model of our solar system',
-      subject: 'Science',
-      progress: 60,
-      dueDate: 'Dec 30, 2025',
-      priority: 'high',
-      tasks: [
-        { id: '1-1', title: 'Research planet sizes', completed: true },
-        { id: '1-2', title: 'Learn orbital patterns', completed: true },
-        { id: '1-3', title: 'Record descriptions', completed: false },
-        { id: '1-4', title: 'Practice presentation', completed: false },
-      ],
-    },
-    {
-      id: '2',
-      title: 'Math Problem Set',
-      description: 'Complete 20 algebra problems with voice explanations',
-      subject: 'Mathematics',
-      progress: 75,
-      dueDate: 'Dec 28, 2025',
-      priority: 'medium',
-      tasks: [
-        { id: '2-1', title: 'Linear equations (10 problems)', completed: true },
-        { id: '2-2', title: 'Quadratic equations (5 problems)', completed: true },
-        { id: '2-3', title: 'Word problems (5 problems)', completed: false },
-      ],
-    },
-  ]);
+  const { projects, setProjects, createProject, updateProject } = useResources();
 
   // Handler for voice agent to change settings
   const handleSettingChange = (setting_id, value) => {
@@ -106,29 +77,43 @@ export default function UserDashboard() {
   };
 
   // Handler for voice agent to manage projects (create and edit)
-  const handleProjectAction = (action, data) => {
+  const handleProjectAction = async (action, data) => {
     console.log(`Project action via voice: ${action}`, data);
     
     if (action === 'create') {
-      const newProject = {
-        id: `project-${Date.now()}`, // Generate a unique ID
-        title: data.title || "New Project",
-        description: data.description || "",
-        subject: data.subject || "General",
-        progress: 0,
-        dueDate: data.dueDate || "Not set",
-        priority: data.priority || "medium",
-        tasks: data.tasks || [] // If agent suggested initial tasks
-      };
-      setProjects(prev => [...prev, newProject]);
-      console.log('Created new project:', newProject);
+      try {
+        // Backend expects snake_case (due_date). Accept both camelCase and snake_case from agent.
+        const payload = {
+          title: data.title || "New Project",
+          description: data.description || "",
+          subject: data.subject || "General",
+          due_date: data.due_date || data.dueDate || null,
+          priority: data.priority || "medium",
+        };
+        const newProject = await createProject(payload);
+        console.log('Created new project:', newProject);
+      } catch (err) {
+        console.error('Failed to create project via voice:', err);
+      }
     } 
     
     else if (action === 'edit') {
-      setProjects(prev => prev.map(proj => 
-        proj.id === data.id ? { ...proj, ...data } : proj
-      ));
-      console.log('Edited project:', data);
+      try {
+        if (!data.id) throw new Error("No project ID provided for edit");
+        const payload = { ...data };
+        delete payload.id; // Don't send id in payload body
+
+        // Normalize camelCase → snake_case for backend
+        if ('dueDate' in payload) {
+          payload.due_date = payload.dueDate;
+          delete payload.dueDate;
+        }
+        
+        const updatedProject = await updateProject(data.id, payload);
+        console.log('Edited project:', updatedProject);
+      } catch (err) {
+        console.error('Failed to edit project via voice:', err);
+      }
     }
   };
 
