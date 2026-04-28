@@ -1,6 +1,6 @@
 # backend/app/api/projects.py
 from flask_smorest import Blueprint, abort
-from ..schemas.projects import ProjectCreateSchema, ProjectUpdateSchema, ProjectOutSchema
+from ..schemas.projects import ProjectCreateSchema, ProjectUpdateSchema, ProjectOutSchema, ProjectQuerySchema
 from ..services.projects_service import (
     list_projects, create_project, update_project, delete_project
 )
@@ -10,11 +10,12 @@ projects_blp = Blueprint("projects", __name__, url_prefix="/projects", descripti
 
 @projects_blp.route("/", methods=["GET"])
 @require_auth
+@projects_blp.arguments(ProjectQuerySchema, location="query")
 @projects_blp.response(200, ProjectOutSchema(many=True))
-def get_projects():
+def get_projects(query_params):
     user_id = get_current_user_id()
     try:
-        return list_projects(user_id)
+        return list_projects(user_id, query_params)
     except Exception as e:
         abort(502, message=str(e))
 
