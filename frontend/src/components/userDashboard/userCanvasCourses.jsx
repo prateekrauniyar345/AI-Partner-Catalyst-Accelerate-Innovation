@@ -4,8 +4,13 @@ import { Card, Button, Spinner, Accordion } from 'react-bootstrap';
 import { useUser } from '../../contexts/userContext';
 
 function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizzes, syllabus, isLoading }) {
+  const courseName = course.name || course.course_name || course.display_name || '';
   return (
-    <Card style={{ marginBottom: 16, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+    <Card
+      style={{ marginBottom: 16, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+      data-course-name={courseName}
+      data-course-expanded={isExpanded ? 'true' : 'false'}
+    >
       <Card.Header
         style={{
           display: 'flex',
@@ -61,7 +66,7 @@ function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizze
             <>
               {/* Course Syllabus */}
               {syllabus && (
-                <div className="mb-4">
+                <div className="mb-4" data-section="syllabus">
                   <h6 className="fw-bold mb-2">Course Syllabus</h6>
                   <Accordion defaultActiveKey={null} className="mb-3">
                     <Accordion.Item eventKey="syllabus" key="syllabus">
@@ -82,7 +87,7 @@ function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizze
               )}
 
               {/* Modules */}
-              <div className="mb-4">
+              <div className="mb-4" data-section="modules">
                 <h6 className="fw-bold mb-2">Modules ({modules?.length || 0})</h6>
                 {modules && modules.length > 0 ? (
                   <Accordion defaultActiveKey={null} className="mb-3">
@@ -112,7 +117,7 @@ function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizze
               </div>
 
               {/* Assignments */}
-              <div className="mb-4">
+              <div className="mb-4" data-section="assignments">
                 <h6 className="fw-bold mb-2">Assignments ({assignments?.length || 0})</h6>
                 {assignments && assignments.length > 0 ? (
                   <Accordion defaultActiveKey={null} className="mb-3">
@@ -161,7 +166,7 @@ function CourseCard({ course, onExpand, isExpanded, modules, assignments, quizze
               </div>
 
               {/* Quizzes */}
-              <div className="mb-4">
+              <div className="mb-4" data-section="quizzes">
                 <h6 className="fw-bold mb-2">Quizzes ({quizzes?.length || 0})</h6>
                 {quizzes && quizzes.length > 0 ? (
                   <Accordion defaultActiveKey={null} className="mb-3">

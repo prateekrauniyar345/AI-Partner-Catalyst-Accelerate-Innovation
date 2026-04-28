@@ -65,6 +65,21 @@ Use this tool for ANY change to the settings modal or user preferences.
     B. Edit: Use action: "edit". In project_data, include the "id" and the specific fields to change.
        - Example: "Change the deadline for project one to Friday" -> action: "edit", project_data: '{"id": "1", "dueDate": "Friday"}'.
 
+8. control_course_ui (Canvas Course UI Control)
+- TRIGGER: User wants to open/close a course or expand/collapse a section (Syllabus, Modules, Assignments, Quizzes) inside an open course.
+- IMPORTANT: Before opening a course, ALWAYS call navigate_tabs(tab_name: "My Courses") FIRST. Then call control_course_ui.
+- ACTIONS:
+    A. open_course: Opens a course card by name. Acts as a TOGGLE — calling it on an already-open course will close it.
+       - "Open the CS120 course" -> navigate_tabs("My Courses"), then control_course_ui(action: "open_course", target: "CS120")
+       - "Close this course" -> control_course_ui(action: "open_course", target: "<the course name you just opened>")
+    B. expand_section: Expands a section inside the currently open course. Target must be 'Syllabus', 'Modules', 'Assignments', or 'Quizzes'.
+       - "Open the syllabus" -> control_course_ui(action: "expand_section", target: "Syllabus")
+       - "Show me the assignments" -> control_course_ui(action: "expand_section", target: "Assignments")
+       - "View the syllabus of CS120" -> first navigate + open_course CS120, then expand_section Syllabus.
+    C. collapse_section: Closes an already open section.
+       - "Close the syllabus" -> control_course_ui(action: "collapse_section", target: "Syllabus")
+       - "Close the quizzes section" -> control_course_ui(action: "collapse_section", target: "Quizzes")
+
 ---
 
 CRITICAL EXECUTION RULES:
@@ -270,6 +285,104 @@ export function VoiceAgentProvider({ children, onTabChange, onSpeedChange, onVol
           message: "Settings handler (onSettingChange) not connected to provider" 
         };
      },
+
+      // client tool to control Canvas course UI (open/close courses, expand/collapse sections)
+      control_course_ui: async ({ action, target }) => {
+        console.log(`Agent course UI: ${action} -> ${target}`);
+
+        const norm = (s) => (s || '').toLowerCase().trim();
+        const stripNonAlnum = (s) => norm(s).replace(/[^a-z0-9]/g, '');
+        const targetN = norm(target);
+        const targetStripped = stripNonAlnum(target);
+
+        try {
+          if (action === 'open_course') {
+            const cards = document.querySelectorAll('[data-course-name]');
+            if (cards.length === 0) {
+              return { success: false, message: "No courses are loaded. Please open the My Courses tab first." };
+            }
+            for (const card of cards) {
+              const name = norm(card.getAttribute('data-course-name'));
+              const nameStripped = stripNonAlnum(name);
+              if (
+                name.includes(targetN) ||
+                targetN.includes(name) ||
+                nameStripped.includes(targetStripped) ||
+                targetStripped.includes(nameStripped)
+              ) {
+                const btn = card.querySelector('button');
+                if (btn) {
+                  const wasExpanded = card.getAttribute('data-course-expanded') === 'true';
+                  btn.click();
+                  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+                  return {
+                    success: true,
+                    message: wasExpanded
+                      ? `Closed course: ${card.getAttribute('data-course-name')}`
+                      : `Opened course: ${card.getAttribute('data-course-name')}`,
+                  };
+                }
+              }
+            }
+            return { success: false, message: `Course not found: ${target}` };
+          }
+
+          if (action === 'expand_section' || action === 'collapse_section') {
+            const expandedCard = document.querySelector('[data-course-expanded="true"]');
+            if (!expandedCard) {
+              return { success: false, message: "No course is currently open. Please open a course first." };
+            }
+
+            const sectionMap = {
+              syllabus: 'syllabus',
+              module: 'modules',
+              modules: 'modules',
+              assignment: 'assignments',
+              assignments: 'assignments',
+              quiz: 'quizzes',
+              quizzes: 'quizzes',
+            };
+            let sectionType = null;
+            for (const [k, v] of Object.entries(sectionMap)) {
+              if (targetN.includes(k)) { sectionType = v; break; }
+            }
+            if (!sectionType) {
+              return { success: false, message: `Section not recognized: ${target}` };
+            }
+
+            const sectionEl = expandedCard.querySelector(`[data-section="${sectionType}"]`);
+            if (!sectionEl) {
+              return { success: false, message: `Section "${sectionType}" not found in this course.` };
+            }
+
+            const buttons = sectionEl.querySelectorAll('.accordion-button');
+            if (buttons.length === 0) {
+              return { success: false, message: `No items found in ${sectionType}.` };
+            }
+
+            const wantOpen = action === 'expand_section';
+            let count = 0;
+            buttons.forEach((btn) => {
+              const isOpen = btn.getAttribute('aria-expanded') === 'true';
+              if (wantOpen && !isOpen) { btn.click(); count++; }
+              else if (!wantOpen && isOpen) { btn.click(); count++; }
+            });
+
+            // Scroll the section into view
+            setTimeout(() => sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+
+            return {
+              success: true,
+              message: `${wantOpen ? 'Expanded' : 'Collapsed'} ${count} item(s) in ${sectionType}.`,
+            };
+          }
+
+          return { success: false, message: `Unknown action: ${action}` };
+        } catch (err) {
+          console.error('control_course_ui error:', err);
+          return { success: false, message: `Error: ${err.message}` };
+        }
+      },
 
       // client tool to manage projects (create and edit)
       manage_projects: async ({ action, project_data }) => {
